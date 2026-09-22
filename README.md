@@ -33,6 +33,14 @@ At rank 8 under full A+B sharing, moving from **decoder-only → backbone-only �
 
 Across IID and severe Dirichlet α=0.1 partitions, seed-aligned common-test AP falls by **2.13 ± 1.82** points for FedLoRA-AB, versus **14.48 ± 1.24** for FedLoRA-A and **11.25 ± 1.08** for FedLoRA-B. Full fine-tuning falls by **1.43 ± 0.45** points. Thus AB is the best-retaining **evaluated rank-8 LoRA sharing policy**, not the best method overall. Client assignments differ between partition regimes, so the changes are distribution-shift sensitivity estimates rather than identical-image causal effects.
 
+### Held-out test examples
+
+The two rows below show **different** official AOD-4 v6 test images. Within each row, every method sees the **same** image: the top row compares LoRA placement on a drone image, and the bottom row compares factor sharing on a helicopter image. The two source groups do not occur in the training or validation split under the audited filename/SHA-256 identity rule. Images were chosen from ground truth alone, before any predictions were viewed; all models use the seed-42, validation-best checkpoint, rank 8, and a fixed **0.25 display threshold**. The white square marks a ground-truth-defined zoom region. This figure illustrates individual outputs, **not** the three-seed AP ranking.
+
+![Prediction-blind held-out test comparison: top row LoRA placement, bottom row factor sharing](assets/qualitative_comparison_seed42.png)
+
+All three placement variants detect the illustrated drone; their visible differences are mostly localization and confidence. On the illustrated helicopter, FedLoRA-A emits overlapping *helicopter* (0.624) and erroneous *airplane* (0.616) predictions at the same box; the rendered labels overlap. This one case does not establish a general class-confusion rate or superiority of a sharing policy. See the [selection protocol and interpretation limits](docs/QUALITATIVE_TEST.md). The original selection/prediction JSONs are retained in the author evidence archive, but are not part of this public draft because they contain server-specific paths and provenance details. Source images: [AOD-4, Soni et al., Mendeley Data V1](https://doi.org/10.17632/cd5z895tr2.1), licensed [CC BY 4.0](https://data.mendeley.com/datasets/cd5z895tr2/1); model boxes, insets, and annotations were added for this study.
+
 ## Reproduce the study
 
 See [Reproducibility](docs/REPRODUCIBILITY.md) for environment setup, AOD-4 preparation, split verification, preflight checks, and commands for the primary, placement, rank, and heterogeneity experiments. The code's named entry points are:
@@ -61,7 +69,7 @@ The reported runs used Python 3.9.18, PyTorch 2.5.1+cu124, torchvision 0.20.1, a
 - The [selected-checkpoint index](artifacts/checkpoint_index.json) covers 96 validation-selected models (4,554,894,872 bytes in total). A user-reported read-only server check verified all 96 against their recorded sizes and SHA-256 values; **public downloads are still pending**. See [Checkpoints](docs/CHECKPOINTS.md).
 - The 96 complete result JSONs, their derived tables, and the frozen MIA audit are separate research artifacts. The received JSON archive's [SHA-256](artifacts/result_bundle_sha256.txt) is recorded, but its publication location and immutable release identifier will be added only after upload and verification.
 - The [server-source comparison](provenance/SERVER_SOURCE_COMPARISON.md) distinguishes byte-identical experiment code from five documented release-only portability/comment edits; recovery/evidence utilities are a separate pending review.
-- The [held-out test qualitative protocol](docs/QUALITATIVE_TEST.md) preselects source-disjoint test examples from ground truth before rendering with validation-selected checkpoints. Its figure is an illustration, not an additional AP result.
+- The [held-out test qualitative protocol](docs/QUALITATIVE_TEST.md) preselects source-disjoint test examples from ground truth before rendering with validation-selected checkpoints. The [figure](assets/qualitative_comparison_seed42.png) is included; the raw selection/prediction metadata is retained privately pending disclosure review. This is an illustration, not an additional AP result.
 
 ## Interpretation boundaries
 
