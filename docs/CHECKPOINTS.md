@@ -20,7 +20,7 @@ python3 scripts/verify_checkpoint_assets.py \
 sha256sum /home/gpuadmin/kim/fedsalora/rtdetr-l.pt
 ```
 
-The verifier must report all 96 files present with the expected size and digest. It does not rewrite checkpoints, result JSONs, or split manifests. When binaries are available, a recipient should compare every downloaded asset to its index entry before loading it. Never load an untrusted PyTorch pickle checkpoint: `torch.load` can execute code.
+The user ran this verifier on the historical server using draft PR code and reported `[PASS] checkpoints 96/96 verified; bytes=4554894872`; the pretrained SHA-256 also matched the recorded value. The verifier does not rewrite checkpoints, result JSONs, or split manifests. Repeat this check immediately before asset upload, then compare every public download to the index. Never load an untrusted PyTorch pickle checkpoint: `torch.load` can execute code.
 
 ## Model-state semantics
 
@@ -28,4 +28,4 @@ The verifier must report all 96 files present with the expected size and digest.
 
 The current source tree does **not yet provide a validated read-only evaluation-only CLI** for released checkpoints. Do not use `main.py --resume` against archived primary directories as an evaluation shortcut: that path writes evaluation manifests, logs, plots and result JSONs. The existing data validator also binds a manifest to its original absolute data root and generated YOLO tree digests. Evaluation on a relocated checkout needs a separately validated relocation/reconstruction protocol, or a path-equivalent historical data tree. This is a release gate, not a reason to modify old manifests in place.
 
-The 96 checkpoint files are on the historical training server but have **not yet been transferred into this public repository or independently rehashed in this local release tree**. Download links will be added only after verification and publication. Until then, do not interpret an index record as proof that the corresponding binary is publicly available.
+The 96 checkpoint files are on the historical training server and passed the user-reported server-side checksum check, but have **not yet been published as download assets or independently rehashed after download**. Links will be added only after publication and public-download verification. Until then, do not interpret an index record as proof that the corresponding binary is publicly available.
