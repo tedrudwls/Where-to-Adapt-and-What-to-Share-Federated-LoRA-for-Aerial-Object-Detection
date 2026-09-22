@@ -49,6 +49,7 @@ scripts/run_rank_sensitivity.sh     historical FedLoRA-A rank wrapper
 scripts/run_heterogeneity_cell.sh   IID and Dirichlet α=0.1 cells
 scripts/mia_*audit.py               read-only endpoint-MIA sensitivity analyses
 scripts/verify_checkpoint_assets.py read-only 96-checkpoint SHA-256 check
+scripts/render_test_qualitative.py two-stage held-out test figure (select, then render)
 ```
 
 The reported runs used Python 3.9.18, PyTorch 2.5.1+cu124, torchvision 0.20.1, and Ultralytics 8.4.126 on RTX A6000 GPUs. A fresh installation in a different environment should run the tests and preflight before any long training. The study used 640-pixel inputs, batch size eight, AdamW, five-effective-epoch warmup followed by cosine decay, no AMP, and no early stopping. **Do not use test AP to select a checkpoint.**
@@ -60,6 +61,7 @@ The reported runs used Python 3.9.18, PyTorch 2.5.1+cu124, torchvision 0.20.1, a
 - The [selected-checkpoint index](artifacts/checkpoint_index.json) covers 96 validation-selected models (4,554,894,872 bytes in total). A user-reported read-only server check verified all 96 against their recorded sizes and SHA-256 values; **public downloads are still pending**. See [Checkpoints](docs/CHECKPOINTS.md).
 - The 96 complete result JSONs, their derived tables, and the frozen MIA audit are separate research artifacts. The received JSON archive's [SHA-256](artifacts/result_bundle_sha256.txt) is recorded, but its publication location and immutable release identifier will be added only after upload and verification.
 - The [server-source comparison](provenance/SERVER_SOURCE_COMPARISON.md) distinguishes byte-identical experiment code from five documented release-only portability/comment edits; recovery/evidence utilities are a separate pending review.
+- The [held-out test qualitative protocol](docs/QUALITATIVE_TEST.md) preselects source-disjoint test examples from ground truth before rendering with validation-selected checkpoints. Its figure is an illustration, not an additional AP result.
 
 ## Interpretation boundaries
 
