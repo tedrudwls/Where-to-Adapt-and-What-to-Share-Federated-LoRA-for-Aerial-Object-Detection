@@ -1,0 +1,18 @@
+# Recorded experiment runtime: Python 3.9.18. This dependency file alone does
+# not guarantee binary compatibility on other Python/CUDA platforms.
+#
+# For a CUDA server, install the PyTorch build matching the server driver first
+# when the default PyPI wheel is not appropriate, then install this file.  The
+# ultralytics pin is mandatory because models/rtdetr_lora.py relies on its
+# internal RT-DETR module layout and checks this exact version at runtime.
+torch==2.5.1
+torchvision==0.20.1
+ultralytics==8.4.126
+
+# Direct project dependencies (listed explicitly for reproducibility).
+numpy==1.26.4
+PyYAML==6.0.2
+matplotlib==3.9.2
+scikit-learn==1.5.2
+Pillow==11.0.0
+opencv-python==4.10.0.84

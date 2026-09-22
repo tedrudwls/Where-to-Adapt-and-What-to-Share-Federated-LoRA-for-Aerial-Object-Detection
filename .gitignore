@@ -1,0 +1,26 @@
+# Local environment and generated outputs
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.DS_Store
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Raw datasets, generated YOLO trees and experiment outputs
+data/splits/yolo_*/
+data/splits/.aod4_source_hash_inventory_cache.json
+results/
+logs/
+*.pt
+*.pth
+*.ckpt
+*.safetensors
+
+# Editor and machine-local files
+.vscode/
+.idea/
+.env
+.env.*
+!.env.example
