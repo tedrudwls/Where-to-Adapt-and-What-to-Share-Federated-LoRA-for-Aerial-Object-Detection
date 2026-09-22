@@ -4,7 +4,7 @@ This checklist separates **available source/provenance** from **still-private bi
 
 - [x] Curate experiment source, tests, launchers, data manifest provenance and documentation without raw AOD-4 images.
 - [x] Record all 96 selected checkpoint names, sizes, SHA-256 digests and prerequisite pretrained/split digests.
-- [x] Verify seven critical executable source files against the archived server code snapshot. The `requirements.txt` package pins match, but its explanatory Python-version comment was corrected for this release draft, so its file SHA differs. The remaining helpers still need a final server-vs-release comparison before tagging a reproducibility release.
+- [x] Compare the supplied complete server source archive against the draft: 49 common files are byte-identical and five contain documented portability/comment-only changes. Four recovery/evidence-only server scripts are intentionally excluded pending dependency and disclosure review; see [source comparison](../provenance/SERVER_SOURCE_COMPARISON.md).
 - [x] Compile Python, syntax-check shell scripts, run dependency-free tests and validate README/doc links in the local draft.
 - [ ] Choose the exact project code license and document separate terms for learned checkpoints, original RT-DETR-L weights and the AOD-4 dataset. Do not infer permission for one from permission for another.
 - [x] On the historical server, the user ran the draft-branch read-only verifier: `[PASS] checkpoints 96/96 verified; bytes=4554894872`. The reported `rtdetr-l.pt` SHA-256 is `6de60b10d4bc566f00cda0f5b4d64afe4b66d48dc9695d2171effb7859d8e73f`, matching the recorded digest. This is a user-supplied server result, not an independent download verification; repeat it before the final asset upload.
