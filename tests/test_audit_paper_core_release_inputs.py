@@ -208,6 +208,18 @@ class CoreAuditTests(unittest.TestCase):
             target._load_release_spec(spec_path), records, index_identity
         )
 
+    def test_code_checkout_metadata_is_named_relative_to_code_not_source_project(self):
+        unrelated_source_project = self.root / "historical-project"
+        unrelated_source_project.mkdir()
+        self.assertEqual(
+            target._metadata_relative_path(
+                target.DEFAULT_SPEC.resolve(),
+                unrelated_source_project.resolve(),
+                "fallback.json",
+            ),
+            "artifacts/paper_core_checkpoint_release_spec.json",
+        )
+
     def test_method_contracts_distinguish_all_four_state_layouts(self):
         for method in target.METHOD_ORDER:
             with self.subTest(method=method):

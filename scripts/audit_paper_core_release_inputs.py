@@ -309,6 +309,17 @@ def _source_identity(path: Path, relative: str) -> dict:
     }
 
 
+def _metadata_relative_path(path: Path, source_project: Path, fallback: str) -> str:
+    """Name trusted metadata without exposing either checkout's absolute path."""
+
+    for root in (PROJECT_ROOT.resolve(), source_project):
+        try:
+            return path.relative_to(root).as_posix()
+        except ValueError:
+            continue
+    return fallback
+
+
 def _verify_historical_identity(path: Path, record: Mapping[str, Any]) -> dict:
     relative = str(record["historical_project_relative_path"])
     actual = _source_identity(path, relative)
@@ -703,16 +714,12 @@ def run_audit(
     except (OSError, ValueError, json.JSONDecodeError) as error:
         raise CoreAuditError(f"Invalid checkpoint index: {error}") from error
     selected = select_core_records(records)
-    index_relative = (
-        index_resolved.relative_to(project_root).as_posix()
-        if index_resolved.is_relative_to(project_root)
-        else "checkpoint_index.json"
+    index_relative = _metadata_relative_path(
+        index_resolved, project_root, "checkpoint_index.json"
     )
     index_before = _source_identity(index_resolved, index_relative)
-    spec_relative = (
-        spec_resolved.relative_to(project_root).as_posix()
-        if spec_resolved.is_relative_to(project_root)
-        else "paper_core_checkpoint_release_spec.json"
+    spec_relative = _metadata_relative_path(
+        spec_resolved, project_root, "paper_core_checkpoint_release_spec.json"
     )
     spec_before = _source_identity(spec_resolved, spec_relative)
     spec = _load_release_spec(spec_resolved)
