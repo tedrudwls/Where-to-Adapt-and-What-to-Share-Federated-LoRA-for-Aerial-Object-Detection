@@ -1,0 +1,255 @@
+{
+  "schema_version": 1,
+  "status": "complete",
+  "purpose": "static_qualitative_illustration_not_AP_evidence",
+  "selection_policy": "seed43_client1_source_disjoint_helicopter_gt_area_p10_p50_p90_v1",
+  "prediction_blind_selection": true,
+  "partition": {
+    "type": "dirichlet",
+    "alpha": 0.4,
+    "training_seed": 43,
+    "partition_seed": 43,
+    "client_id": 1,
+    "split_manifest_sha256": "728f9e3e25f723b69633cd6ec80a954a7c2c61912287774839032ef9611b3afa",
+    "source_inventory_sha256": "4eeb888993e362898f78e448bf199f06278fce1592748364c24483fe95f57f08",
+    "annotation_sha256": {
+      "train": "2747ec58917c399c4bc20ef110900fcda5df45b655e7d350d96013da22d2ffa4",
+      "val": "55e232cf11e1012460288864ea00c2a4b2fed9d6684eec8d63b72cfb4a6707f4",
+      "test": "761fa3c537c15017edccb5acdcd35ae78ca52746bf010630862de1798d572595"
+    }
+  },
+  "class_map": {
+    "0": "airplane",
+    "1": "bird",
+    "2": "drone",
+    "3": "helicopter"
+  },
+  "support": {
+    "focal_client_train": {
+      "helicopter_boxes": 0,
+      "helicopter_positive_images": 0
+    },
+    "focal_client_val": {
+      "helicopter_boxes": 142,
+      "helicopter_positive_images": 142
+    },
+    "focal_client_test": {
+      "total_images": 748,
+      "helicopter_boxes": 75,
+      "helicopter_positive_images": 75
+    },
+    "other_clients_train_helicopter_boxes": 5528
+  },
+  "client_local_helicopter_AP": {
+    "evaluation_population": "full_748_image_client_local_test_partition",
+    "scale": "0_to_1",
+    "fedlora_ab": 0.6290612928197131,
+    "fedlora_a": 0.0008867924528301886,
+    "fedlora_b": 0.08034074162904922
+  },
+  "rendering": {
+    "input_size": 640,
+    "display_confidence_threshold": 0.25,
+    "display_threshold_is_not_AP_threshold": true
+  },
+  "selection_provenance": {
+    "selection_json_sha256": "662196351ef4bd40f4e202fbab03f52418a0070adb8e4c71b566014c405e2c17",
+    "eligible_source_disjoint_official_test_images": 2036,
+    "helicopter_candidate_count": 75,
+    "source_disjoint_definition": "selected image source group absent from both train and validation",
+    "tie_breaker": "image_id"
+  },
+  "pretrained_model": {
+    "name": "rtdetr-l.pt",
+    "sha256": "6de60b10d4bc566f00cda0f5b4d64afe4b66d48dc9695d2171effb7859d8e73f"
+  },
+  "methods": {
+    "fedlora_ab": {
+      "experiment_id": "seed_43/fl_lora_r8_a0.4",
+      "selected_round": 20,
+      "checkpoint_sha256": "ad928c84c5f1a82f7f88334ce5825422d1249bd59cb934eaeb3ddac3a751ff02",
+      "result_json_sha256": "fc6b26c4bdae6a9c3b0804d8f738cab3ee7b408bc0be12574a64f1003072d2b1"
+    },
+    "fedlora_a": {
+      "experiment_id": "seed_43/fl_fedsa_lora_r8_a0.4",
+      "selected_round": 20,
+      "checkpoint_sha256": "c0ebf42091e3381c933a824c0b53f993af72c016c2e5015105ef90889448c616",
+      "result_json_sha256": "db2342c89dd4d3245dd4dd04881c348068f36b33d59a5b26ac51cc2300c71d8d"
+    },
+    "fedlora_b": {
+      "experiment_id": "seed_43/fl_fixed_share_b_lora_r8_a0.4",
+      "selected_round": 6,
+      "checkpoint_sha256": "f454435dc0a37530c919ccfff921ddfbe84fb18bc1919477cad186fdf513116d",
+      "result_json_sha256": "7d3f9004eef74ff6c19564db2cddb6075e10b6b4ca8f638f6cfe45a1694bcf7f"
+    }
+  },
+  "images": [
+    {
+      "area_stratum": "p10_small",
+      "area_rank": 8,
+      "candidate_count": 75,
+      "image_id": 62,
+      "file_name": "V_HELICOPTER_059283_108_png_jpg.rf.06f929e5e5e546932550dd02d2122242.jpg",
+      "image_sha256": "0c4c441fa4fd369752ef4da23814edca8d94e5c9967807c7a379d5653cf8c012",
+      "source_group_id": "ed9e251719017300fc0eb9dc815a07e68f91beb1eb44a3ff95e374fb12631580",
+      "width": 1024,
+      "height": 1024,
+      "normalized_gt_area": 0.0026178359985351562,
+      "ground_truth": [
+        {
+          "class_id": 3,
+          "class_name": "helicopter",
+          "xyxy": [653.0, 486.0, 698.0, 547.0]
+        }
+      ],
+      "predictions": {
+        "fedlora_ab": [
+          {
+            "class_id": 3,
+            "class_name": "helicopter",
+            "confidence": 0.5778945088386536,
+            "xyxy": [653.8284912109375, 490.32781982421875, 697.0565185546875, 544.9347534179688]
+          },
+          {
+            "class_id": 2,
+            "class_name": "drone",
+            "confidence": 0.2870696187019348,
+            "xyxy": [752.8751831054688, 976.2254638671875, 807.8060913085938, 1023.281005859375]
+          }
+        ],
+        "fedlora_a": [
+          {
+            "class_id": 2,
+            "class_name": "drone",
+            "confidence": 0.6075560450553894,
+            "xyxy": [656.8801879882812, 500.9743957519531, 694.2297973632812, 541.2720336914062]
+          },
+          {
+            "class_id": 2,
+            "class_name": "drone",
+            "confidence": 0.42489489912986755,
+            "xyxy": [950.1034545898438, 868.3837280273438, 1023.9572143554688, 940.3390502929688]
+          }
+        ],
+        "fedlora_b": [
+          {
+            "class_id": 2,
+            "class_name": "drone",
+            "confidence": 0.6858208775520325,
+            "xyxy": [657.3037109375, 499.5533752441406, 692.97265625, 539.3843994140625]
+          }
+        ]
+      },
+      "published_figure": {
+        "path": "assets/unseen_helicopter_s43_c1_small_image62.png",
+        "sha256": "70051e516a9aff01d6377ef011dd13193a0a0bed11810998a84d2dd90f539120",
+        "width": 1072,
+        "height": 1236
+      }
+    },
+    {
+      "area_stratum": "p50_median",
+      "area_rank": 38,
+      "candidate_count": 75,
+      "image_id": 1114,
+      "file_name": "V_HELICOPTER_050274_275_png_jpg.rf.7c1c65587d12e5e4dd2fa6c52e672da9.jpg",
+      "image_sha256": "afb1aa1aed04d969f3eb1dc55795ccf03b74f818786b01f703ac6bf4df3b2057",
+      "source_group_id": "aa7620a37b51f7775514fe135c53d820a4944eab2b9b080a5ce5025efd601511",
+      "width": 1024,
+      "height": 1024,
+      "normalized_gt_area": 0.035147666931152344,
+      "ground_truth": [
+        {
+          "class_id": 3,
+          "class_name": "helicopter",
+          "xyxy": [442.0, 287.0, 637.0, 476.0]
+        }
+      ],
+      "predictions": {
+        "fedlora_ab": [
+          {
+            "class_id": 3,
+            "class_name": "helicopter",
+            "confidence": 0.8747663497924805,
+            "xyxy": [457.1204833984375, 297.3239440917969, 625.9527587890625, 469.0480651855469]
+          }
+        ],
+        "fedlora_a": [
+          {
+            "class_id": 2,
+            "class_name": "drone",
+            "confidence": 0.8214656114578247,
+            "xyxy": [467.51617431640625, 301.303466796875, 594.6445922851562, 465.82537841796875]
+          }
+        ],
+        "fedlora_b": [
+          {
+            "class_id": 2,
+            "class_name": "drone",
+            "confidence": 0.6691320538520813,
+            "xyxy": [464.0165710449219, 297.1305236816406, 601.8419799804688, 469.9333190917969]
+          }
+        ]
+      },
+      "published_figure": {
+        "path": "assets/unseen_helicopter_s43_c1_median_image1114.png",
+        "sha256": "2d830b9b1001a60e6174e8ccb242863038442006d882d1f9dd3b6d9d775bb9ad",
+        "width": 1072,
+        "height": 1236
+      }
+    },
+    {
+      "area_stratum": "p90_large",
+      "area_rank": 68,
+      "candidate_count": 75,
+      "image_id": 1177,
+      "file_name": "yt-vB1rz9EBhP8-0284_jpg.rf.834583ba6ba3de81bf2e758e94635d0c.jpg",
+      "image_sha256": "d9618f10fbc34d3c04add92ec841a71f45dda2ab6478f593b31d4a9a57bdadae",
+      "source_group_id": "52e204c589907d6d678b9813aef21b38bd5c5600be9507d24fa8dd6a1f3f4831",
+      "width": 1024,
+      "height": 1024,
+      "normalized_gt_area": 0.4103660583496094,
+      "ground_truth": [
+        {
+          "class_id": 3,
+          "class_name": "helicopter",
+          "xyxy": [368.0, 98.0, 1018.0, 760.0]
+        }
+      ],
+      "predictions": {
+        "fedlora_ab": [
+          {
+            "class_id": 3,
+            "class_name": "helicopter",
+            "confidence": 0.8610736727714539,
+            "xyxy": [313.315673828125, 112.11477661132812, 1023.0526123046875, 717.672119140625]
+          }
+        ],
+        "fedlora_a": [
+          {
+            "class_id": 0,
+            "class_name": "airplane",
+            "confidence": 0.9267734885215759,
+            "xyxy": [422.1393737792969, 296.62860107421875, 1023.361083984375, 714.6746215820312]
+          }
+        ],
+        "fedlora_b": [
+          {
+            "class_id": 0,
+            "class_name": "airplane",
+            "confidence": 0.8722650408744812,
+            "xyxy": [415.96746826171875, 260.5743713378906, 1023.8787231445312, 719.5040283203125]
+          }
+        ]
+      },
+      "published_figure": null
+    }
+  ],
+  "interpretation_limits": [
+    "single_naturally_occurring_seed_client_class_case",
+    "not_zero_shot_or_open_vocabulary",
+    "validation_contains_helicopter_positives_and_selected_checkpoints",
+    "selected_examples_source_disjoint_only_not_full_test_partition",
+    "figures_do_not_establish_causal_factor_superiority"
+  ]
+}
