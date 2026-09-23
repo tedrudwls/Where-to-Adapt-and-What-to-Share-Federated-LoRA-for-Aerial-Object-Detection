@@ -70,8 +70,9 @@ scripts/evaluate_checkpoint.py      P0 read-only representative-checkpoint AP re
 
 The evaluator's exact artifact hashes, safety boundary and artifact-host
 acceptance command are documented in [Read-only evaluation](docs/READ_ONLY_EVALUATION.md).
-Its model/GPU path remains a release gate until that command passes on the
-pinned environment.
+The authors report that the pinned GPU/model path passed that command on
+2026-09-23 and matched the archived client-local and common-test metrics within
+the frozen absolute tolerance (`1e-6`).
 
 The reported runs used Python 3.9.18, PyTorch 2.5.1+cu124, torchvision 0.20.1, and Ultralytics 8.4.126 on RTX A6000 GPUs. A fresh installation in a different environment should run the tests and preflight before any long training. The study used 640-pixel inputs, batch size eight, AdamW, five-effective-epoch warmup followed by cosine decay, no AMP, and no early stopping. **Do not use test AP to select a checkpoint.**
 
