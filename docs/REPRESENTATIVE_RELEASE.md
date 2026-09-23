@@ -156,6 +156,23 @@ Use the Phase-1 tree recorded by the artifact-host build log only for the first
 GPU acceptance run; follow the exact public-mode command in
 [Read-only evaluation](READ_ONLY_EVALUATION.md).
 
+The first GPU acceptance run completed on 2026-09-23 using evaluator source
+commit `461bb35b3d22f3d44da9c68e4cb9ead5ebad4761` on an NVIDIA RTX A6000. All 35
+targeted tests passed; the evaluator verified 2,241 test images, reported a
+passing final integrity gate, and reproduced client-local macro AP
+`0.6190019159385891` and common pooled-test macro AP
+`0.5620845765652397` with maximum absolute error `0.0`. The exact artifact
+hashes, full AP/AP50/AP75 values and limitations are stored in the path-free
+[pre-release acceptance receipt](../artifacts/representative_public_gpu_acceptance.json).
+
+This completes only the initial sanitized-checkpoint acceptance. The remaining
+Phase-2 gate is to rebuild from a clean commit containing that receipt, require
+the same public checkpoint SHA-256, size, tensor fingerprint and tensor count,
+structurally verify the new archive, and replay the checkpoint extracted from
+that new archive. The new archive digest is expected to differ from the
+Phase-1 digest because its embedded source commit changes. Do not upload, tag,
+or call the artifact public until the rebuilt candidate passes.
+
 ## Phase 3: GitHub Release and clean re-download
 
 Create an immutable release tag only after Phase 2 passes. Upload the archive

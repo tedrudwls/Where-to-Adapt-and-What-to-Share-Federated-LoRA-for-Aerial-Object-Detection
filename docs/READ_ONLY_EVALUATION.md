@@ -134,6 +134,18 @@ reference within the frozen absolute tolerance (`1e-6`).
 This validates the vertical slice for the exact frozen artifacts and pinned
 environment; checkpoint download publication remains a separate release task.
 
+The sanitized public-checkpoint form was then tested from evaluator source
+commit `461bb35b3d22f3d44da9c68e4cb9ead5ebad4761` on the same recorded RTX A6000
+artifact-host environment. Thirty-five targeted tests passed, all 2,241 test
+images and the public checkpoint/replay/pretrained identities were verified,
+and the final integrity gate passed. The recomputed client-local macro AP was
+`0.6190019159385891`, the common pooled-test macro AP was
+`0.5620845765652397`, and the maximum absolute reference error was `0.0`.
+The path-free [pre-release acceptance receipt](../artifacts/representative_public_gpu_acceptance.json)
+records the complete AP/AP50/AP75 values, hashes, runtime and reporting scope.
+This is an author-run evaluation replay for one checkpoint and one environment;
+it is not training reproduction or independent public-download verification.
+
 ## Public replay mode
 
 `--replay-manifest` is mutually exclusive with the author-side `--split-file`.
@@ -142,10 +154,12 @@ It removes the need to publish the historical path-bearing schema-v7 manifest.
 compared with the hash-pinned compact evaluation reference, while the report
 explicitly records `archived_result_verified: false`.
 
-The Phase-1 build fixed the sanitized checkpoint identity listed above. It has
-not yet passed the GPU replay or been published as a GitHub Release asset. On
-the artifact host, evaluate the already-built Phase-1 checkpoint with a clean
-post-pin checkout as follows:
+The Phase-1 build fixed the sanitized checkpoint identity listed above. That
+checkpoint passed the author-run pre-release GPU replay recorded in the
+[acceptance receipt](../artifacts/representative_public_gpu_acceptance.json),
+but it has not been published as a GitHub Release asset or verified by clean
+public re-download. The command below is the frozen public replay procedure for
+the artifact host and for the required post-acceptance rebuild:
 
 ```bash
 : "${PROJECT_DIR:?Set PROJECT_DIR to a clean post-pin checkout}"
@@ -183,7 +197,9 @@ print("[PASS] Sanitized public checkpoint reproduced the frozen metrics")
 PY
 ```
 
-After this gate passes, rebuild once from the clean post-pin commit. The public
+The initial public GPU gate has passed. Next, rebuild once from the clean commit
+that contains the acceptance receipt and this documentation. The public
 checkpoint SHA-256 and tensor fingerprint must remain identical; the archive
-SHA-256 will change because the embedded source commit changes. See the staged
-[representative release procedure](REPRESENTATIVE_RELEASE.md).
+SHA-256 will change because the embedded source commit changes. Structurally
+verify that rebuilt archive and replay its extracted checkpoint before upload.
+See the staged [representative release procedure](REPRESENTATIVE_RELEASE.md).
