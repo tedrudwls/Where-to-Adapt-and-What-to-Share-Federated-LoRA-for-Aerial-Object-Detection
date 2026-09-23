@@ -33,6 +33,22 @@ At rank 8 under full A+B sharing, moving from **decoder-only → backbone-only �
 
 Across IID and severe Dirichlet α=0.1 partitions, seed-aligned common-test AP falls by **2.13 ± 1.82** points for FedLoRA-AB, versus **14.48 ± 1.24** for FedLoRA-A and **11.25 ± 1.08** for FedLoRA-B. Full fine-tuning falls by **1.43 ± 0.45** points. Thus AB is the best-retaining **evaluated rank-8 LoRA sharing policy**, not the best method overall. Client assignments differ between partition regimes, so the changes are distribution-shift sensitivity estimates rather than identical-image causal effects.
 
+### Qualitative case: no client-local helicopter training positives
+
+Under the seed-43 Dirichlet α=0.4 partition, client 1 had no helicopter-positive image or box in its local training set, while the other two clients jointly had 5,528 helicopter training boxes. Client 1's validation partition contained 142 helicopter positives and was used for checkpoint selection. This is therefore a **zero local training support** case, not zero-shot or open-vocabulary detection.
+
+On all 75 helicopter-positive images in client 1's official-test partition, helicopter AP was **62.91** for FedLoRA-AB, **0.09** for FedLoRA-A (Share-A / local B), and **8.03** for FedLoRA-B (Share-B / local A), on the README's 0–100 scale. The two examples below were fixed from ground truth before predictions were inspected: among eligible test images whose audited source group was absent from both training and validation, they are the p10 and p50 ranks by normalized ground-truth box area. All panels use the corresponding rank-8 validation-selected checkpoint and a fixed **0.25 display threshold**.
+
+**Small target (p10; official-test image 62).**
+
+![Small-target helicopter comparison for seed 43, client 1](assets/unseen_helicopter_s43_c1_small_image62.png)
+
+**Median-size target (p50; official-test image 1114).**
+
+![Median-size helicopter comparison for seed 43, client 1](assets/unseen_helicopter_s43_c1_median_image1114.png)
+
+FedLoRA-AB labels the target as *helicopter* in both examples, whereas both selective-sharing endpoints label it as *drone*. In the small-target example, FedLoRA-AB and FedLoRA-A also emit off-target *drone* false positives at 0.287 and 0.425; these outputs are intentionally retained rather than hidden. The images illustrate the aggregate AP result but do not by themselves establish causal superiority. Federated updates can carry helicopter-relevant information from the other clients, and helicopter-positive validation data informed checkpoint selection. Source images: [AOD-4, Soni et al., Mendeley Data V1](https://doi.org/10.17632/cd5z895tr2.1), licensed [CC BY 4.0](https://data.mendeley.com/datasets/cd5z895tr2/1); model boxes, labels, and the small-target inset were added for this study.
+
 ## Reproduce the study
 
 See [Reproducibility](docs/REPRODUCIBILITY.md) for environment setup, AOD-4 preparation, split verification, preflight checks, and commands for the primary, placement, rank, and heterogeneity experiments. The code's named entry points are:
