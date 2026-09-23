@@ -65,6 +65,7 @@ EXPECTED_PATH_FIELDS = {
     ("experiment", "model_weights"),
 }
 PUBLIC_PRETRAINED_PATH = "external/rtdetr-l.pt"
+RAW_FORBIDDEN_MARKERS = (b"/home/", b"/Users/", b"gpuadmin", b"file://")
 SOURCE_REPOSITORY = (
     "https://github.com/tedrudwls/"
     "Where-to-Adapt-and-What-to-Share-Federated-LoRA-for-Aerial-Object-Detection"
@@ -282,6 +283,7 @@ def build_replay_manifest(split: Mapping[str, Any]) -> dict:
 def _path_string(value: str) -> bool:
     return (
         value.startswith("/")
+        or value.startswith("\\\\")
         or value.startswith("file://")
         or bool(re.match(r"^[A-Za-z]:[\\/]", value))
     )
@@ -335,6 +337,36 @@ def sanitize_checkpoint_payload(payload: Any) -> tuple[dict, list[dict]]:
     if remaining:
         raise BundleError("Sanitized checkpoint still contains an absolute path")
     return sanitized, replacements
+
+
+def _assert_no_private_checkpoint_markers(
+    raw: bytes, historical_path_values: Sequence[str]
+) -> None:
+    """Reject reviewed source paths and high-confidence private markers.
+
+    Arbitrary path regexes are intentionally not applied to serialized binary
+    bytes: random tensor/storage bytes can coincidentally spell a short pattern
+    such as ``C:/``. Windows and POSIX absolute paths are instead checked over
+    every structured string before and after serialization.
+    """
+
+    residual_markers = [
+        value for value in historical_path_values if value.encode("utf-8") in raw
+    ]
+    forbidden_markers = [
+        marker.decode("ascii") for marker in RAW_FORBIDDEN_MARKERS if marker in raw
+    ]
+    if residual_markers or forbidden_markers:
+        raise BundleError(
+            "Serialized public checkpoint retains a private path marker: "
+            + json.dumps(
+                {
+                    "reviewed_paths": residual_markers,
+                    "forbidden_markers": forbidden_markers,
+                },
+                sort_keys=True,
+            )
+        )
 
 
 def _tensor_fingerprint(payload: Any, torch: Any) -> tuple[str, int]:
@@ -589,32 +621,9 @@ def _build_bundle(args: argparse.Namespace) -> None:
         if any(_path_string(value) for _, value in _walk_strings(reloaded)):
             raise BundleError("Saved public checkpoint contains an absolute path")
         public_checkpoint_raw = public_checkpoint.read_bytes()
-        residual_markers = [
-            value for value in historical_path_values
-            if value.encode("utf-8") in public_checkpoint_raw
-        ]
-        forbidden_markers = [
-            marker.decode("ascii")
-            for marker in (b"/home/", b"/Users/", b"gpuadmin", b"file://")
-            if marker in public_checkpoint_raw
-        ]
-        if residual_markers or forbidden_markers or re.search(
-            rb"(?<![A-Za-z])[A-Za-z]:[\\/]", public_checkpoint_raw
-        ):
-            raise BundleError(
-                "Serialized public checkpoint retains a private path marker: "
-                + json.dumps(
-                    {
-                        "reviewed_paths": residual_markers,
-                        "forbidden_markers": forbidden_markers,
-                        "windows_absolute_path": bool(re.search(
-                            rb"(?<![A-Za-z])[A-Za-z]:[\\/]",
-                            public_checkpoint_raw,
-                        )),
-                    },
-                    sort_keys=True,
-                )
-            )
+        _assert_no_private_checkpoint_markers(
+            public_checkpoint_raw, historical_path_values
+        )
 
         replay_path = stage / "metadata" / REPLAY_ASSET_NAME
         _write_bytes_exclusive(replay_path, committed_replay_raw)

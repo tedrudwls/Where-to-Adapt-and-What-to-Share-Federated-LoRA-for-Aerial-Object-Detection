@@ -82,6 +82,36 @@ class RepresentativeReleaseBuilderTests(unittest.TestCase):
         with self.assertRaisesRegex(target.BundleError, "absolute-path inventory"):
             target.sanitize_checkpoint_payload(payload)
 
+    def test_checkpoint_sanitizer_rejects_an_unreviewed_windows_path(self):
+        payload = {
+            "architecture": {"model_weight_path": r"C:\\models\\rtdetr-l.pt"},
+            "experiment": {"model_weights": r"C:\\models\\rtdetr-l.pt"},
+            "unexpected": r"D:\\private\\secret.txt",
+        }
+        with self.assertRaisesRegex(target.BundleError, "absolute-path inventory"):
+            target.sanitize_checkpoint_payload(payload)
+
+    def test_checkpoint_sanitizer_rejects_an_unc_path(self):
+        payload = {
+            "architecture": {"model_weight_path": "/srv/model/rtdetr-l.pt"},
+            "experiment": {"model_weights": "/srv/model/rtdetr-l.pt"},
+            "unexpected": r"\\server\share\secret.txt",
+        }
+        with self.assertRaisesRegex(target.BundleError, "absolute-path inventory"):
+            target.sanitize_checkpoint_payload(payload)
+
+    def test_binary_marker_gate_avoids_short_windows_pattern_false_positive(self):
+        target._assert_no_private_checkpoint_markers(
+            b"tensor-bytes-\x00C:/\xff-random", ["/srv/model/rtdetr-l.pt"]
+        )
+
+    def test_binary_marker_gate_rejects_a_reviewed_historical_path(self):
+        with self.assertRaisesRegex(target.BundleError, "private path marker"):
+            target._assert_no_private_checkpoint_markers(
+                b"prefix-/srv/model/rtdetr-l.pt-suffix",
+                ["/srv/model/rtdetr-l.pt"],
+            )
+
     def test_bundle_notice_uses_an_immutable_repository_link(self):
         raw = target._bundle_third_party_notice(
             target.PROJECT_ROOT, "a" * 40
