@@ -124,7 +124,7 @@ class RepresentativeFixture:
         self.manifest_payload = {
             "metadata": {
                 **copy.deepcopy(target.FROZEN_MANIFEST_PROTOCOL),
-                "data_root": "/historical/server/AOD4/Images",
+                "data_root": "historical-data-root",
                 "annotation_sha256": {"test": _sha256(self.annotation)},
                 "split_counts": split_counts,
                 "source_split_counts": copy.deepcopy(split_counts),
@@ -199,7 +199,9 @@ class RepresentativeFixture:
         _write_json(self.replay, self.replay_payload)
 
         self.checkpoint = root / "best_federated.pt"
-        self.checkpoint.write_bytes(b"synthetic-checkpoint")
+        self.checkpoint.write_bytes(b"synthetic-historical-checkpoint")
+        self.public_checkpoint = root / "public_best_federated.pt"
+        self.public_checkpoint.write_bytes(b"synthetic-public-checkpoint")
         self.model_weights = root / "rtdetr-l.pt"
         self.model_weights.write_bytes(b"synthetic-pretrained-model")
 
@@ -305,7 +307,7 @@ class RepresentativeFixture:
                 "bytes": self.replay.stat().st_size,
                 "sha256": _sha256(self.replay),
             },
-            "checkpoint": {
+            "historical_checkpoint": {
                 "release_asset_name": self.record["release_asset_name"],
                 "historical_project_relative_path": self.record[
                     "historical_project_relative_path"
@@ -315,6 +317,22 @@ class RepresentativeFixture:
                 "selected_round": 20,
                 "contract": copy.deepcopy(target.FROZEN_CHECKPOINT_CONTRACT),
                 "compatibility": copy.deepcopy(target.FROZEN_COMPATIBILITY),
+            },
+            "public_checkpoint": {
+                "file_name": self.record["release_asset_name"],
+                "bytes": self.public_checkpoint.stat().st_size,
+                "sha256": _sha256(self.public_checkpoint),
+                "historical_source": {
+                    "bytes": self.record["bytes"],
+                    "sha256": self.record["sha256"],
+                },
+                "tensor_fingerprint": {
+                    "algorithm": (
+                        "recursive_path_dtype_shape_raw_bytes_sha256_v1"
+                    ),
+                    "sha256": "d" * 64,
+                    "tensor_count": 3,
+                },
             },
             "pretrained_model": {
                 "file_name": "rtdetr-l.pt",
@@ -365,7 +383,7 @@ class RepresentativeFixture:
 
     def public_argv(self):
         return [
-            "--checkpoint", str(self.checkpoint),
+            "--checkpoint", str(self.public_checkpoint),
             "--checkpoint-index", str(self.index),
             "--reference", str(self.reference),
             "--model-weights", str(self.model_weights),
@@ -377,8 +395,12 @@ class RepresentativeFixture:
     def frozen_identity_patch(self):
         return mock.patch.multiple(
             target,
-            FROZEN_CHECKPOINT_BYTES=self.record["bytes"],
-            FROZEN_CHECKPOINT_SHA256=self.record["sha256"],
+            FROZEN_HISTORICAL_CHECKPOINT_BYTES=self.record["bytes"],
+            FROZEN_HISTORICAL_CHECKPOINT_SHA256=self.record["sha256"],
+            FROZEN_PUBLIC_CHECKPOINT_BYTES=self.public_checkpoint.stat().st_size,
+            FROZEN_PUBLIC_CHECKPOINT_SHA256=_sha256(self.public_checkpoint),
+            FROZEN_PUBLIC_TENSOR_FINGERPRINT_SHA256="d" * 64,
+            FROZEN_PUBLIC_TENSOR_COUNT=3,
             FROZEN_PRETRAINED_SHA256=self.record["pretrained_sha256"],
             FROZEN_SPLIT_SHA256=self.record["split_manifest_sha256"],
             FROZEN_ARCHIVED_RESULT_BYTES=self.archived_result.stat().st_size,
@@ -418,11 +440,12 @@ class ReadOnlyEvaluationTests(unittest.TestCase):
         report = json.loads(stdout)
         self.assertEqual(report["status"], "pass")
         self.assertTrue(report["read_only"])
+        self.assertEqual(report["inputs"]["checkpoint"]["variant"], "historical")
         self.assertEqual(report["metric_scale"], "0_to_1")
         self.assertEqual(report["inputs"]["test_images_verified"], 3)
         self.assertEqual(
             report["runtime"]["historical_data_root"],
-            "/historical/server/AOD4/Images",
+            "historical-data-root",
         )
         self.assertEqual(
             report["runtime"]["relocated_data_root_used"],
@@ -447,6 +470,9 @@ class ReadOnlyEvaluationTests(unittest.TestCase):
         self.assertEqual(before, _tree_snapshot(self.root))
         report = json.loads(stdout)
         self.assertEqual(report["runtime"]["manifest_mode"], "public_replay")
+        self.assertEqual(
+            report["inputs"]["checkpoint"]["variant"], "public_sanitized"
+        )
         self.assertIsNone(report["runtime"]["historical_data_root"])
         self.assertIsNone(report["runtime"]["relocated_data_root_used"])
         self.assertFalse(report["inputs"]["archived_result_verified"])
@@ -464,6 +490,27 @@ class ReadOnlyEvaluationTests(unittest.TestCase):
             observed["split_sha256"], self.fixture.record["split_manifest_sha256"]
         )
         self.assertEqual(observed["client_sizes"], [10, 11, 12])
+
+    def test_historical_and_public_checkpoint_identities_cannot_be_crossed(self):
+        evaluator = mock.Mock(side_effect=AssertionError("must not be called"))
+        historical_with_public = self.fixture.argv()
+        historical_with_public[1] = str(self.fixture.public_checkpoint)
+        code, stdout, stderr = self.invoke_argv(
+            evaluator, historical_with_public
+        )
+        self.assertEqual(code, 2)
+        self.assertEqual(stdout, "")
+        self.assertIn("historical checkpoint", stderr)
+        evaluator.assert_not_called()
+
+        evaluator.reset_mock()
+        public_with_historical = self.fixture.public_argv()
+        public_with_historical[1] = str(self.fixture.checkpoint)
+        code, stdout, stderr = self.invoke_argv(evaluator, public_with_historical)
+        self.assertEqual(code, 2)
+        self.assertEqual(stdout, "")
+        self.assertIn("public_sanitized checkpoint", stderr)
+        evaluator.assert_not_called()
 
     def test_public_replay_mutation_fails_before_model_evaluation(self):
         payload = copy.deepcopy(self.fixture.replay_payload)

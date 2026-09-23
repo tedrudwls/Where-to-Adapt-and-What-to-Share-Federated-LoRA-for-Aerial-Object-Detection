@@ -33,6 +33,14 @@ HISTORICAL_CHECKPOINT_SHA256 = (
     "3ed025419506009465add698da75fef941c20c0b16eb347bb224820781b9cac4"
 )
 HISTORICAL_CHECKPOINT_BYTES = 3316516
+PUBLIC_CHECKPOINT_SHA256 = (
+    "391205473ad8de24af56ba1b566e54a6f305dd0b79806cb468583e84e464fa14"
+)
+PUBLIC_CHECKPOINT_BYTES = 3316452
+PUBLIC_TENSOR_FINGERPRINT_SHA256 = (
+    "b42e1e811238caf1ec76e788547dbcf46d8f390b3b0e63864cf3d303e88c6d4f"
+)
+PUBLIC_TENSOR_COUNT = 231
 HISTORICAL_SPLIT_SHA256 = (
     "74a45a37f4b05c474564993ff15f5548875f3e767abc19a0d2d30f195e1754c5"
 )
@@ -207,6 +215,11 @@ def _validate_manifest(raw: bytes, files: dict[str, bytes]) -> dict:
     if set(by_path) != expected_records:
         raise VerificationError("Bundle manifest payload file set changed")
     checkpoint = by_path[f"checkpoint/{CHECKPOINT_NAME}"]
+    if (
+        checkpoint.get("bytes") != PUBLIC_CHECKPOINT_BYTES
+        or checkpoint.get("sha256") != PUBLIC_CHECKPOINT_SHA256
+    ):
+        raise VerificationError("Public checkpoint identity changed")
     if checkpoint.get("historical_source") != {
         "bytes": HISTORICAL_CHECKPOINT_BYTES,
         "sha256": HISTORICAL_CHECKPOINT_SHA256,
@@ -243,6 +256,11 @@ def _validate_manifest(raw: bytes, files: dict[str, bytes]) -> dict:
         or not re.fullmatch(r"[0-9a-f]{64}", str(tensor.get("sha256", "")))
     ):
         raise VerificationError("Checkpoint tensor fingerprint is invalid")
+    if (
+        tensor.get("sha256") != PUBLIC_TENSOR_FINGERPRINT_SHA256
+        or tensor.get("tensor_count") != PUBLIC_TENSOR_COUNT
+    ):
+        raise VerificationError("Public checkpoint tensor fingerprint changed")
     external = manifest.get("external_inputs", {})
     if not isinstance(external, dict) or set(external) != {
         "pretrained_model", "dataset"

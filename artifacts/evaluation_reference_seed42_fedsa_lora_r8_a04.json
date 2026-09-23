@@ -11,7 +11,7 @@
     "bytes": 472024,
     "sha256": "ffe7b2932dfcfb0027a8e607abb3d8d5c8a5241d549b280524b77be5f3b44c88"
   },
-  "checkpoint": {
+  "historical_checkpoint": {
     "release_asset_name": "seed_42__fl_fedsa_lora_r8_a0.4__best_federated.pt",
     "historical_project_relative_path": "results/official_v6/seed_42/fl_fedsa_lora_r8_a0.4/weights/best_federated.pt",
     "bytes": 3316516,
@@ -87,6 +87,20 @@
       "apply_lora_backbone": true,
       "apply_lora_decoder": true,
       "backbone_min_channels": 64
+    }
+  },
+  "public_checkpoint": {
+    "file_name": "seed_42__fl_fedsa_lora_r8_a0.4__best_federated.pt",
+    "bytes": 3316452,
+    "sha256": "391205473ad8de24af56ba1b566e54a6f305dd0b79806cb468583e84e464fa14",
+    "historical_source": {
+      "bytes": 3316516,
+      "sha256": "3ed025419506009465add698da75fef941c20c0b16eb347bb224820781b9cac4"
+    },
+    "tensor_fingerprint": {
+      "algorithm": "recursive_path_dtype_shape_raw_bytes_sha256_v1",
+      "sha256": "b42e1e811238caf1ec76e788547dbcf46d8f390b3b0e63864cf3d303e88c6d4f",
+      "tensor_count": 231
     }
   },
   "pretrained_model": {

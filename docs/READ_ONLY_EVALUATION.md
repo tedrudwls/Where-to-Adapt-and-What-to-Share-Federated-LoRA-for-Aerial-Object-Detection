@@ -56,12 +56,13 @@ schema-v7 manifest and checkpoint. This is not a full data-provenance reaudit.
 
 | Input | Frozen identity |
 | --- | --- |
-| `best_federated.pt` | `3ed025419506009465add698da75fef941c20c0b16eb347bb224820781b9cac4`, 3,316,516 bytes |
+| historical `best_federated.pt` (author-side mode) | `3ed025419506009465add698da75fef941c20c0b16eb347bb224820781b9cac4`, 3,316,516 bytes |
+| sanitized public `best_federated.pt` (public replay mode) | `391205473ad8de24af56ba1b566e54a6f305dd0b79806cb468583e84e464fa14`, 3,316,452 bytes; tensor fingerprint `b42e1e811238caf1ec76e788547dbcf46d8f390b3b0e63864cf3d303e88c6d4f` over 231 tensors |
 | `rtdetr-l.pt` | `6de60b10d4bc566f00cda0f5b4d64afe4b66d48dc9695d2171effb7859d8e73f` |
 | `split_official_v6_dirichlet_a0.4_c3_s42.json` | `74a45a37f4b05c474564993ff15f5548875f3e767abc19a0d2d30f195e1754c5` |
 | archived `fl_results.json` | `ed2b53790bc3a44a157ce61f078332723be388744af54ec315cac3badbfa2c4d`, 5,297,013 bytes |
 | public replay manifest | `ffe7b2932dfcfb0027a8e607abb3d8d5c8a5241d549b280524b77be5f3b44c88`, 472,024 bytes |
-| committed evaluation reference | `5990f1e0141c4cd883c83ad35aff45bb29de1df438f27cf40fd95476f58b18ec` |
+| committed evaluation reference | `4f6d33eeb255a96d0f49c51600dcf546a2ac5d96e782bd9826094f848e98dbef` |
 
 The checkpoint index, compact expected-metric record, and path-free replay
 manifest are committed under `artifacts/`. The checkpoint, complete split
@@ -141,10 +142,48 @@ It removes the need to publish the historical path-bearing schema-v7 manifest.
 compared with the hash-pinned compact evaluation reference, while the report
 explicitly records `archived_result_verified: false`.
 
-The committed replay manifest is ready, but the final command is intentionally
-not presented as a completed public download yet. The release builder creates a
-path-sanitized checkpoint whose file SHA-256 differs from the historical source.
-That new identity must first be generated, reviewed, pinned in this evaluator,
-and accepted on the GPU. See the staged
-[representative release procedure](REPRESENTATIVE_RELEASE.md). Until that gate
-is complete, use the author-side command above for the historical checkpoint.
+The Phase-1 build fixed the sanitized checkpoint identity listed above. It has
+not yet passed the GPU replay or been published as a GitHub Release asset. On
+the artifact host, evaluate the already-built Phase-1 checkpoint with a clean
+post-pin checkout as follows:
+
+```bash
+: "${PROJECT_DIR:?Set PROJECT_DIR to a clean post-pin checkout}"
+: "${BUILD_ROOT:?Set BUILD_ROOT to the Phase-1 build directory}"
+: "${DATA_ROOT:?Set DATA_ROOT to the verified AOD-4 Images directory}"
+: "${MODEL_WEIGHTS:?Set MODEL_WEIGHTS to the verified rtdetr-l.pt file}"
+PYTHON_BIN="${PYTHON_BIN:-python3}"
+REPORT="$BUILD_ROOT/output/public_gpu_replay.json"
+
+cd "$PROJECT_DIR"
+"$PYTHON_BIN" \
+  scripts/evaluate_checkpoint.py \
+  --checkpoint \
+    "$BUILD_ROOT/output/representative-replay/checkpoint/seed_42__fl_fedsa_lora_r8_a0.4__best_federated.pt" \
+  --model-weights "$MODEL_WEIGHTS" \
+  --replay-manifest \
+    "$BUILD_ROOT/output/representative-replay/metadata/seed_42__fl_fedsa_lora_r8_a0.4__replay_manifest.json" \
+  --data-root "$DATA_ROOT" \
+  --device cuda:0 \
+  > "$REPORT"
+
+"$PYTHON_BIN" - "$REPORT" <<'PY'
+import json
+import sys
+
+with open(sys.argv[1], encoding="utf-8") as stream:
+    report = json.load(stream)
+
+assert report["status"] == "pass"
+assert report["integrity_gate"]["status"] == "pass"
+assert report["reference_comparison"]["passed"] is True
+assert report["inputs"]["checkpoint"]["variant"] == "public_sanitized"
+assert report["inputs"]["test_images_verified"] == 2241
+print("[PASS] Sanitized public checkpoint reproduced the frozen metrics")
+PY
+```
+
+After this gate passes, rebuild once from the clean post-pin commit. The public
+checkpoint SHA-256 and tensor fingerprint must remain identical; the archive
+SHA-256 will change because the embedded source commit changes. See the staged
+[representative release procedure](REPRESENTATIVE_RELEASE.md).

@@ -45,10 +45,18 @@ SHA256_LENGTH = 64
 CHECKPOINT_SCHEMA = 5
 CHECKPOINT_KIND = "federated_personalized"
 FEDSA_PAYLOAD_POLICY = "global_A_plus_global_task_head__local_B"
-FROZEN_CHECKPOINT_BYTES = 3316516
-FROZEN_CHECKPOINT_SHA256 = (
+FROZEN_HISTORICAL_CHECKPOINT_BYTES = 3316516
+FROZEN_HISTORICAL_CHECKPOINT_SHA256 = (
     "3ed025419506009465add698da75fef941c20c0b16eb347bb224820781b9cac4"
 )
+FROZEN_PUBLIC_CHECKPOINT_BYTES = 3316452
+FROZEN_PUBLIC_CHECKPOINT_SHA256 = (
+    "391205473ad8de24af56ba1b566e54a6f305dd0b79806cb468583e84e464fa14"
+)
+FROZEN_PUBLIC_TENSOR_FINGERPRINT_SHA256 = (
+    "b42e1e811238caf1ec76e788547dbcf46d8f390b3b0e63864cf3d303e88c6d4f"
+)
+FROZEN_PUBLIC_TENSOR_COUNT = 231
 FROZEN_PRETRAINED_SHA256 = (
     "6de60b10d4bc566f00cda0f5b4d64afe4b66d48dc9695d2171effb7859d8e73f"
 )
@@ -60,7 +68,7 @@ FROZEN_ARCHIVED_RESULT_SHA256 = (
     "ed2b53790bc3a44a157ce61f078332723be388744af54ec315cac3badbfa2c4d"
 )
 FROZEN_REFERENCE_SHA256 = (
-    "5990f1e0141c4cd883c83ad35aff45bb29de1df438f27cf40fd95476f58b18ec"
+    "4f6d33eeb255a96d0f49c51600dcf546a2ac5d96e782bd9826094f848e98dbef"
 )
 FROZEN_AUGMENTATION_PROTOCOL = {
     "implementation": "ultralytics_8.4.126_RTDETRDataset",
@@ -358,8 +366,8 @@ def _select_target_record(records: Sequence[dict], experiment_id: str) -> dict:
             "results/official_v6/seed_42/fl_fedsa_lora_r8_a0.4/"
             "weights/best_federated.pt"
         ),
-        "bytes": FROZEN_CHECKPOINT_BYTES,
-        "sha256": FROZEN_CHECKPOINT_SHA256,
+        "bytes": FROZEN_HISTORICAL_CHECKPOINT_BYTES,
+        "sha256": FROZEN_HISTORICAL_CHECKPOINT_SHA256,
         "pretrained_sha256": FROZEN_PRETRAINED_SHA256,
         "split_manifest_sha256": FROZEN_SPLIT_SHA256,
     }
@@ -391,14 +399,16 @@ def _validate_reference(reference: dict, record: dict) -> dict:
         raise EvaluationError("Evaluation reference method must be fedsa_lora")
     if reference.get("metric_scale") != "0_to_1":
         raise EvaluationError("Evaluation reference metric scale must be 0_to_1")
-    checkpoint = reference.get("checkpoint")
+    historical_checkpoint = reference.get("historical_checkpoint")
+    public_checkpoint = reference.get("public_checkpoint")
     pretrained = reference.get("pretrained_model")
     split = reference.get("split_manifest")
     archived = reference.get("archived_result")
     public_replay = reference.get("public_replay_manifest")
     expected = reference.get("expected")
     if not all(isinstance(value, dict) for value in (
-        checkpoint, pretrained, split, archived, public_replay, expected
+        historical_checkpoint, public_checkpoint, pretrained, split, archived,
+        public_replay, expected
     )):
         raise EvaluationError("Evaluation reference is incomplete")
     if (
@@ -410,18 +420,29 @@ def _validate_reference(reference: dict, record: dict) -> dict:
         or public_replay["bytes"] <= 0
     ):
         raise EvaluationError("Evaluation reference public replay identity is invalid")
+    public_historical = public_checkpoint.get("historical_source")
+    public_tensor = public_checkpoint.get("tensor_fingerprint")
+    if not isinstance(public_historical, dict) or not isinstance(public_tensor, dict):
+        raise EvaluationError(
+            "Evaluation reference public-checkpoint provenance is incomplete"
+        )
     cross_checks = {
         "release_asset_name": (
-            checkpoint.get("release_asset_name"), record.get("release_asset_name")
+            historical_checkpoint.get("release_asset_name"),
+            record.get("release_asset_name"),
         ),
         "historical_project_relative_path": (
-            checkpoint.get("historical_project_relative_path"),
+            historical_checkpoint.get("historical_project_relative_path"),
             record.get("historical_project_relative_path"),
         ),
-        "checkpoint.bytes": (checkpoint.get("bytes"), record.get("bytes")),
-        "checkpoint.sha256": (checkpoint.get("sha256"), record.get("sha256")),
+        "checkpoint.bytes": (
+            historical_checkpoint.get("bytes"), record.get("bytes")
+        ),
+        "checkpoint.sha256": (
+            historical_checkpoint.get("sha256"), record.get("sha256")
+        ),
         "checkpoint.selected_round": (
-            checkpoint.get("selected_round"), record.get("selected_at")
+            historical_checkpoint.get("selected_round"), record.get("selected_at")
         ),
         "pretrained.sha256": (
             pretrained.get("sha256"), record.get("pretrained_sha256")
@@ -440,12 +461,53 @@ def _validate_reference(reference: dict, record: dict) -> dict:
             "Evaluation reference and checkpoint index disagree: "
             + json.dumps(mismatches, sort_keys=True)
         )
-    checkpoint_contract = checkpoint.get("contract")
+    public_checks = {
+        "file_name": (
+            public_checkpoint.get("file_name"), record.get("release_asset_name")
+        ),
+        "bytes": (
+            public_checkpoint.get("bytes"), FROZEN_PUBLIC_CHECKPOINT_BYTES
+        ),
+        "sha256": (
+            public_checkpoint.get("sha256"), FROZEN_PUBLIC_CHECKPOINT_SHA256
+        ),
+        "historical.bytes": (
+            public_historical.get("bytes"),
+            FROZEN_HISTORICAL_CHECKPOINT_BYTES,
+        ),
+        "historical.sha256": (
+            public_historical.get("sha256"),
+            FROZEN_HISTORICAL_CHECKPOINT_SHA256,
+        ),
+        "tensor.algorithm": (
+            public_tensor.get("algorithm"),
+            "recursive_path_dtype_shape_raw_bytes_sha256_v1",
+        ),
+        "tensor.sha256": (
+            public_tensor.get("sha256"),
+            FROZEN_PUBLIC_TENSOR_FINGERPRINT_SHA256,
+        ),
+        "tensor.count": (
+            public_tensor.get("tensor_count"),
+            FROZEN_PUBLIC_TENSOR_COUNT,
+        ),
+    }
+    public_mismatches = {
+        key: {"reference": left, "required": right}
+        for key, (left, right) in public_checks.items()
+        if left != right
+    }
+    if public_mismatches:
+        raise EvaluationError(
+            "Evaluation reference public-checkpoint identity changed: "
+            + json.dumps(public_mismatches, sort_keys=True)
+        )
+    checkpoint_contract = historical_checkpoint.get("contract")
     if checkpoint_contract != FROZEN_CHECKPOINT_CONTRACT:
         raise EvaluationError(
             "Evaluation reference checkpoint contract differs from the frozen target"
         )
-    compatibility = checkpoint.get("compatibility")
+    compatibility = historical_checkpoint.get("compatibility")
     if compatibility != FROZEN_COMPATIBILITY:
         raise EvaluationError(
             "Evaluation reference compatibility differs from the frozen target"
@@ -1641,11 +1703,19 @@ def evaluate(argv: Optional[List[str]] = None, *, evaluator=None) -> tuple[int, 
         reference = _validate_reference(
             _load_json(reference_path, "evaluation reference"), record
         )
+        if historical_mode:
+            checkpoint_variant = "historical"
+            checkpoint_sha256 = FROZEN_HISTORICAL_CHECKPOINT_SHA256
+            checkpoint_bytes = FROZEN_HISTORICAL_CHECKPOINT_BYTES
+        else:
+            checkpoint_variant = "public_sanitized"
+            checkpoint_sha256 = FROZEN_PUBLIC_CHECKPOINT_SHA256
+            checkpoint_bytes = FROZEN_PUBLIC_CHECKPOINT_BYTES
         checkpoint_record = _verify_file(
             checkpoint,
-            label="checkpoint",
-            expected_sha256=FROZEN_CHECKPOINT_SHA256,
-            expected_bytes=FROZEN_CHECKPOINT_BYTES,
+            label=f"{checkpoint_variant} checkpoint",
+            expected_sha256=checkpoint_sha256,
+            expected_bytes=checkpoint_bytes,
         )
         model_record = _verify_file(
             model_weights,
@@ -1663,7 +1733,7 @@ def evaluate(argv: Optional[List[str]] = None, *, evaluator=None) -> tuple[int, 
             )
             archived_metrics = _normalize_archived_result(
                 _load_json(reference_result_path, "archived result"),
-                reference["checkpoint"],
+                reference["historical_checkpoint"],
             )
             _assert_metrics_equal(
                 archived_metrics,
@@ -1710,9 +1780,9 @@ def evaluate(argv: Optional[List[str]] = None, *, evaluator=None) -> tuple[int, 
             trusted_checkpoint = _copy_verified_file(
                 checkpoint,
                 runtime_root / "trusted_inputs" / "best_federated.pt",
-                label="checkpoint",
-                expected_sha256=FROZEN_CHECKPOINT_SHA256,
-                expected_bytes=FROZEN_CHECKPOINT_BYTES,
+                label=f"{checkpoint_variant} checkpoint",
+                expected_sha256=checkpoint_sha256,
+                expected_bytes=checkpoint_bytes,
             )
             trusted_model_weights = _copy_verified_file(
                 model_weights,
@@ -1766,7 +1836,10 @@ def evaluate(argv: Optional[List[str]] = None, *, evaluator=None) -> tuple[int, 
                         ),
                     },
                     "inputs": {
-                        "checkpoint": checkpoint_record,
+                        "checkpoint": {
+                            **checkpoint_record,
+                            "variant": checkpoint_variant,
+                        },
                         "checkpoint_index": {
                             "file_name": index_path.name,
                             "sha256": sha256_file(index_path),

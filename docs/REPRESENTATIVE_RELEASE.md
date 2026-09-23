@@ -54,12 +54,13 @@ so that the exact checkpoint can be loaded with `weights_only=True`.
 ```bash
 set -Eeuo pipefail
 
-SOURCE_PROJECT=/home/gpuadmin/kim/fedsalora
+: "${SOURCE_PROJECT:?Set SOURCE_PROJECT to the historical project checkout}"
+: "${BUILD_PARENT:?Set BUILD_PARENT to a private release-build directory}"
 SOURCE_CHECKPOINT="$SOURCE_PROJECT/results/official_v6/seed_42/fl_fedsa_lora_r8_a0.4/weights/best_federated.pt"
 SOURCE_SPLIT="$SOURCE_PROJECT/data/splits/split_official_v6_dirichlet_a0.4_c3_s42.json"
 PYTHON_BIN="$SOURCE_PROJECT/.venv/bin/python3"
 
-BUILD_ROOT=$(mktemp -d /home/gpuadmin/kim/representative-release-build.XXXXXX)
+BUILD_ROOT=$(mktemp -d "$BUILD_PARENT/representative-release-build.XXXXXX")
 git clone --depth 1 \
   --branch codex/public-replay-bundle-p0 \
   https://github.com/tedrudwls/Where-to-Adapt-and-What-to-Share-Federated-LoRA-for-Aerial-Object-Detection.git \
@@ -93,6 +94,22 @@ hard-bound in the evaluator/release receipt:
 - source Git commit;
 - compact replay manifest SHA-256
   `ffe7b2932dfcfb0027a8e607abb3d8d5c8a5241d549b280524b77be5f3b44c88`.
+
+The artifact-host Phase-1 build completed on 2026-09-23 from source commit
+`aeb0a31b05387eb43afdfbbd94fa4c3b4fcf5484` with:
+
+| Record | Phase-1 value |
+| --- | --- |
+| Sanitized checkpoint | 3,316,452 bytes; `391205473ad8de24af56ba1b566e54a6f305dd0b79806cb468583e84e464fa14` |
+| Tensor fingerprint | 231 tensors; `b42e1e811238caf1ec76e788547dbcf46d8f390b3b0e63864cf3d303e88c6d4f` |
+| Replay manifest | 472,024 bytes; `ffe7b2932dfcfb0027a8e607abb3d8d5c8a5241d549b280524b77be5f3b44c88` |
+| Pre-pin archive | 3,143,801 bytes; `c78d42b872e4435a8e7147ddf0c42e4aca3d9f728d8153d51ced2d820bb785f5` |
+
+The checkpoint and tensor identities are now code-pinned. The archive identity
+above is evidence for the Phase-1 build only, not a final Release identity: the
+required post-pin rebuild embeds a newer source commit and therefore changes
+the archive bytes. The final archive digest is recorded only after that rebuild
+and the clean public re-download gate.
 
 ## External inputs for replay
 
@@ -134,6 +151,10 @@ to fit an unexplained serialization difference. Re-run the structural verifier
 and GPU replay on this rebuilt archive. Only this post-pin build is a release
 candidate, and its embedded source commit must be the commit whose evaluator
 accepts the sanitized checkpoint.
+
+Use the Phase-1 tree recorded by the artifact-host build log only for the first
+GPU acceptance run; follow the exact public-mode command in
+[Read-only evaluation](READ_ONLY_EVALUATION.md).
 
 ## Phase 3: GitHub Release and clean re-download
 

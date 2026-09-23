@@ -400,6 +400,35 @@ def _tensor_fingerprint(payload: Any, torch: Any) -> tuple[str, int]:
     return digest.hexdigest(), count
 
 
+def _assert_pinned_public_checkpoint(
+    raw: bytes, tensor_sha256: str, tensor_count: int
+) -> str:
+    """Bind the deterministic sanitizer output to the reviewed Phase-1 identity."""
+
+    public_sha256 = hashlib.sha256(raw).hexdigest()
+    checks = {
+        "bytes": (len(raw), evaluation.FROZEN_PUBLIC_CHECKPOINT_BYTES),
+        "sha256": (public_sha256, evaluation.FROZEN_PUBLIC_CHECKPOINT_SHA256),
+        "tensor_fingerprint.sha256": (
+            tensor_sha256, evaluation.FROZEN_PUBLIC_TENSOR_FINGERPRINT_SHA256
+        ),
+        "tensor_fingerprint.tensor_count": (
+            tensor_count, evaluation.FROZEN_PUBLIC_TENSOR_COUNT
+        ),
+    }
+    mismatches = {
+        key: {"generated": left, "required": right}
+        for key, (left, right) in checks.items()
+        if left != right
+    }
+    if mismatches:
+        raise BundleError(
+            "Generated public checkpoint differs from the Phase-1 pinned identity: "
+            + json.dumps(mismatches, sort_keys=True)
+        )
+    return public_sha256
+
+
 def _assert_payload_equivalent(
     historical: Any,
     public: Any,
@@ -553,8 +582,8 @@ def _build_bundle(args: argparse.Namespace) -> None:
     checkpoint_raw = _read_verified(
         checkpoint_input,
         label="historical checkpoint",
-        sha256=evaluation.FROZEN_CHECKPOINT_SHA256,
-        size=evaluation.FROZEN_CHECKPOINT_BYTES,
+        sha256=evaluation.FROZEN_HISTORICAL_CHECKPOINT_SHA256,
+        size=evaluation.FROZEN_HISTORICAL_CHECKPOINT_BYTES,
     )
     checkpoint = checkpoint_input.resolve(strict=True)
     source_before = {
@@ -621,6 +650,9 @@ def _build_bundle(args: argparse.Namespace) -> None:
         if any(_path_string(value) for _, value in _walk_strings(reloaded)):
             raise BundleError("Saved public checkpoint contains an absolute path")
         public_checkpoint_raw = public_checkpoint.read_bytes()
+        public_checkpoint_sha = _assert_pinned_public_checkpoint(
+            public_checkpoint_raw, reloaded_tensor_sha, reloaded_tensor_count
+        )
         _assert_no_private_checkpoint_markers(
             public_checkpoint_raw, historical_path_values
         )
@@ -653,8 +685,8 @@ def _build_bundle(args: argparse.Namespace) -> None:
             for path, role in described
         ]
         files[0]["historical_source"] = {
-            "bytes": evaluation.FROZEN_CHECKPOINT_BYTES,
-            "sha256": evaluation.FROZEN_CHECKPOINT_SHA256,
+            "bytes": evaluation.FROZEN_HISTORICAL_CHECKPOINT_BYTES,
+            "sha256": evaluation.FROZEN_HISTORICAL_CHECKPOINT_SHA256,
         }
         files[0]["path_replacements"] = replacements
         files[0]["tensor_fingerprint"] = {
@@ -723,7 +755,6 @@ def _build_bundle(args: argparse.Namespace) -> None:
             staged_checksum,
             f"{archive_sha}  {ARCHIVE_NAME}\n".encode("ascii"),
         )
-        public_checkpoint_sha = sha256_file(public_checkpoint)
         for raw_path, expected in source_before.items():
             path = Path(raw_path)
             actual = (path.stat().st_size, path.stat().st_mtime_ns, sha256_file(path))

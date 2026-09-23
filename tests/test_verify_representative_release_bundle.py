@@ -7,6 +7,7 @@ import json
 import tempfile
 import unittest
 from pathlib import Path
+from unittest import mock
 
 from scripts import build_representative_release_bundle as builder
 from scripts import verify_representative_release_bundle as target
@@ -31,6 +32,15 @@ class RepresentativeReleaseVerifierTests(unittest.TestCase):
         (self.stage / "checkpoint").mkdir(parents=True)
         (self.stage / "metadata").mkdir()
         self.checkpoint = b"synthetic-public-checkpoint"
+        identity_patch = mock.patch.multiple(
+            target,
+            PUBLIC_CHECKPOINT_SHA256=_sha(self.checkpoint),
+            PUBLIC_CHECKPOINT_BYTES=len(self.checkpoint),
+            PUBLIC_TENSOR_FINGERPRINT_SHA256="c" * 64,
+            PUBLIC_TENSOR_COUNT=3,
+        )
+        identity_patch.start()
+        self.addCleanup(identity_patch.stop)
         (self.stage / "checkpoint" / target.CHECKPOINT_NAME).write_bytes(
             self.checkpoint
         )
@@ -176,6 +186,44 @@ class RepresentativeReleaseVerifierTests(unittest.TestCase):
             encoding="ascii",
         )
         with self.assertRaisesRegex(target.VerificationError, "member count"):
+            target.verify(self.archive, self.outer)
+
+    def test_self_consistent_checkpoint_rewrite_still_fails_public_identity_pin(self):
+        checkpoint_path = self.stage / "checkpoint" / target.CHECKPOINT_NAME
+        checkpoint_path.write_bytes(b"different-public-checkpoint")
+        manifest_path = self.stage / "BUNDLE_MANIFEST.json"
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+        record = next(
+            row for row in manifest["files"]
+            if row["path"] == f"checkpoint/{target.CHECKPOINT_NAME}"
+        )
+        record["bytes"] = checkpoint_path.stat().st_size
+        record["sha256"] = _sha(checkpoint_path.read_bytes())
+        manifest_path.write_bytes(_json(manifest))
+        checksum_names = sorted(
+            name for name in (
+                "BUNDLE_MANIFEST.json", "README.md", "LICENSE",
+                "THIRD_PARTY_NOTICES.md",
+                f"checkpoint/{target.CHECKPOINT_NAME}",
+                f"metadata/{target.REPLAY_NAME}",
+            )
+        )
+        (self.stage / "SHA256SUMS").write_text(
+            "".join(
+                f"{_sha((self.stage / name).read_bytes())}  {name}\n"
+                for name in checksum_names
+            ),
+            encoding="ascii",
+        )
+        self.archive.unlink()
+        builder._archive_tree(self.stage, self.archive)
+        self.outer.write_text(
+            f"{target.sha256_file(self.archive)}  {target.ARCHIVE_NAME}\n",
+            encoding="ascii",
+        )
+        with self.assertRaisesRegex(
+            target.VerificationError, "Public checkpoint identity changed"
+        ):
             target.verify(self.archive, self.outer)
 
 

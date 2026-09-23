@@ -7,6 +7,7 @@ import hashlib
 import tempfile
 import unittest
 from pathlib import Path
+from unittest import mock
 
 from scripts import build_representative_release_bundle as target
 from tests.test_evaluate_checkpoint import RepresentativeFixture
@@ -119,6 +120,23 @@ class RepresentativeReleaseBuilderTests(unittest.TestCase):
         text = raw.decode("utf-8")
         self.assertNotIn("](docs/CHECKPOINTS.md)", text)
         self.assertIn(f"/blob/{'a' * 40}/docs/CHECKPOINTS.md", text)
+
+    def test_public_checkpoint_identity_is_independently_pinned(self):
+        raw = b"deterministic-public-checkpoint"
+        digest = hashlib.sha256(raw).hexdigest()
+        with mock.patch.multiple(
+            target.evaluation,
+            FROZEN_PUBLIC_CHECKPOINT_BYTES=len(raw),
+            FROZEN_PUBLIC_CHECKPOINT_SHA256=digest,
+            FROZEN_PUBLIC_TENSOR_FINGERPRINT_SHA256="c" * 64,
+            FROZEN_PUBLIC_TENSOR_COUNT=3,
+        ):
+            self.assertEqual(
+                target._assert_pinned_public_checkpoint(raw, "c" * 64, 3),
+                digest,
+            )
+            with self.assertRaisesRegex(target.BundleError, "pinned identity"):
+                target._assert_pinned_public_checkpoint(raw + b"x", "c" * 64, 3)
 
     def test_replay_manifest_rejects_duplicate_test_assignment(self):
         payload = copy.deepcopy(self.fixture.manifest_payload)
