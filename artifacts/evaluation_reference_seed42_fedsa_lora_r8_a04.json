@@ -1,0 +1,196 @@
+{
+  "schema_version": 1,
+  "protocol": "read_only_representative_checkpoint_evaluation",
+  "experiment_id": "seed_42/fl_fedsa_lora_r8_a0.4",
+  "method": "fedsa_lora",
+  "display_name": "FedLoRA-A (Share-A / local B)",
+  "metric_scale": "0_to_1",
+  "absolute_tolerance": 1e-06,
+  "checkpoint": {
+    "release_asset_name": "seed_42__fl_fedsa_lora_r8_a0.4__best_federated.pt",
+    "historical_project_relative_path": "results/official_v6/seed_42/fl_fedsa_lora_r8_a0.4/weights/best_federated.pt",
+    "bytes": 3316516,
+    "sha256": "3ed025419506009465add698da75fef941c20c0b16eb347bb224820781b9cac4",
+    "selected_round": 20,
+    "contract": {
+      "schema_version": 5,
+      "checkpoint_kind": "federated_personalized",
+      "resume_capability": "evaluation_only_no_optimizer_scheduler_or_rng_state",
+      "selection": "best_macro_client_local_val_AP",
+      "training_rounds_executed": 20,
+      "best_round": 20,
+      "nonfloating_state_policy": "retain_previous_server_value",
+      "federated_payload_policy": "global_A_plus_global_task_head__local_B",
+      "shared_lora_factor_role": "A",
+      "local_lora_factor_role": "B"
+    },
+    "compatibility": {
+      "fl_method": "fedsa_lora",
+      "model_name": "rtdetr-l",
+      "num_classes": 4,
+      "num_clients": 3,
+      "fl_rounds": 20,
+      "local_epochs": 5,
+      "batch_size": 8,
+      "img_size": 640,
+      "num_workers": 4,
+      "lr": 0.0003,
+      "head_lr": 0.0001,
+      "backbone_lr_ratio": 0.1,
+      "weight_decay": 0.0001,
+      "warmup_epochs": 5.0,
+      "min_lr_ratio": 0.01,
+      "grad_clip_norm": 0.1,
+      "close_mosaic_epochs": 10,
+      "fedprox_mu": 0.0,
+      "reset_optimizer_each_round": true,
+      "amp": false,
+      "augmentation_protocol": {
+        "implementation": "ultralytics_8.4.126_RTDETRDataset",
+        "initial": {
+          "hsv_h": 0.015,
+          "hsv_s": 0.7,
+          "hsv_v": 0.4,
+          "degrees": 0.0,
+          "translate": 0.1,
+          "scale": 0.5,
+          "shear": 0.0,
+          "perspective": 0.0,
+          "flipud": 0.0,
+          "fliplr": 0.5,
+          "bgr": 0.0,
+          "mosaic": 1.0,
+          "mixup": 0.0,
+          "cutmix": 0.0,
+          "copy_paste": 0.0,
+          "copy_paste_mode": "flip"
+        },
+        "close_mosaic_effective_epochs_requested": 10,
+        "close_mosaic_disables": ["mosaic", "mixup", "cutmix", "copy_paste"],
+        "rect": false,
+        "cache": false,
+        "train_only": true,
+        "persistent_dataloader_workers": false
+      },
+      "seed": 42,
+      "partition_seed": 42,
+      "partition": "dirichlet",
+      "dirichlet_alpha": 0.4,
+      "lora_rank": 8,
+      "lora_alpha": 16.0,
+      "lora_dropout": 0.0,
+      "apply_lora_backbone": true,
+      "apply_lora_decoder": true,
+      "backbone_min_channels": 64
+    }
+  },
+  "pretrained_model": {
+    "file_name": "rtdetr-l.pt",
+    "sha256": "6de60b10d4bc566f00cda0f5b4d64afe4b66d48dc9695d2171effb7859d8e73f"
+  },
+  "split_manifest": {
+    "file_name": "split_official_v6_dirichlet_a0.4_c3_s42.json",
+    "sha256": "74a45a37f4b05c474564993ff15f5548875f3e767abc19a0d2d30f195e1754c5",
+    "protocol": {
+      "schema_version": 7,
+      "partition": "dirichlet",
+      "dirichlet_alpha": 0.4,
+      "partition_algorithm": "source_group_target_deficit_balance_cross_split_owner_v2",
+      "client_partition_unit": "source_group",
+      "num_clients": 3,
+      "seed": 42,
+      "min_bbox_area": 0.0,
+      "min_bbox_side": 0.0,
+      "drop_empty_images": false,
+      "crowd_policy": "require_zero_crowd_annotations_for_YOLO_metric_equivalence",
+      "category_policy": "exact_aod4_targets_ignore_only_unreferenced_declared_categories",
+      "source_split_policy": "official_aod4_v6",
+      "official_split_preserved": true,
+      "source_identity_policy": "roboflow_source_key_or_exact_sha256_connected_components",
+      "source_split_priority": [],
+      "image_hash_check_enabled": true,
+      "class_names": ["airplane", "bird", "drone", "helicopter"],
+      "cat_id_to_label": {"1": 0, "2": 1, "3": 2, "4": 3}
+    },
+    "split_counts": {
+      "train": {"images": 15761, "annotations": 22058},
+      "val": {"images": 4514, "annotations": 6369},
+      "test": {"images": 2241, "annotations": 3171}
+    },
+    "client_image_counts": {
+      "train": [5253, 5253, 5255],
+      "val": [1503, 1503, 1508],
+      "test": [748, 745, 748]
+    },
+    "source_inventory": {
+      "identity_policy": "roboflow_source_key_or_exact_sha256_connected_components",
+      "inventory_sha256": "4eeb888993e362898f78e448bf199f06278fce1592748364c24483fe95f57f08",
+      "test_image_tree_sha256": "42776a3cfca2f66df7efc1215eb7f64e4d92f445d9e917e4d5f8d0909c50e411"
+    }
+  },
+  "archived_result": {
+    "file_name": "fl_results.json",
+    "bytes": 5297013,
+    "sha256": "ed2b53790bc3a44a157ce61f078332723be388744af54ec315cac3badbfa2c4d"
+  },
+  "expected": {
+    "client_local_test": [
+      {
+        "client_id": 0,
+        "num_images": 748,
+        "AP": 0.5460151497957308,
+        "AP50": 0.8170108577217445,
+        "AP75": 0.5881029110222008
+      },
+      {
+        "client_id": 1,
+        "num_images": 745,
+        "AP": 0.6389346573201458,
+        "AP50": 0.9561294078322982,
+        "AP75": 0.7225102353408523
+      },
+      {
+        "client_id": 2,
+        "num_images": 748,
+        "AP": 0.6720559406998907,
+        "AP50": 0.9349047183095553,
+        "AP75": 0.7236067052995374
+      }
+    ],
+    "client_macro": {
+      "AP": 0.6190019159385891,
+      "AP50": 0.902681661287866,
+      "AP75": 0.6780732838875302
+    },
+    "common_per_client_model": [
+      {
+        "client_id": 0,
+        "AP": 0.5449875395949914,
+        "AP50": 0.815337289974202,
+        "AP75": 0.5913445000092385
+      },
+      {
+        "client_id": 1,
+        "AP": 0.5659131554581776,
+        "AP50": 0.8805678940959538,
+        "AP75": 0.604189741859705
+      },
+      {
+        "client_id": 2,
+        "AP": 0.5753530346425503,
+        "AP50": 0.8769627231941611,
+        "AP75": 0.6268069637979792
+      }
+    ],
+    "common_macro": {
+      "AP": 0.5620845765652397,
+      "AP50": 0.8576226357547724,
+      "AP75": 0.6074470685556409
+    }
+  },
+  "provenance": {
+    "archived_result_source": "official_v6 primary result",
+    "checkpoint_selection": "best macro client-local validation AP",
+    "evaluation_note": "Expected values were extracted without recomputation from the immutable archived result. The CLI independently recomputes them from the indexed checkpoint."
+  }
+}
