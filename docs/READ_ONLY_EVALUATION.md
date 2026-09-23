@@ -124,5 +124,9 @@ integrity failures return `2` and do not emit a success report.
 
 The dependency-free unit tests validate relocation, hash ordering, temporary
 data construction, JSON-only stdout, metric drift and success/failure read-only
-gates. The GPU/model path must still pass the command above on the artifact host
-before this CLI is described as a validated public reproduction route.
+gates. On 2026-09-23, the user ran the command above in the pinned artifact-host
+environment: all 2,241 test images were verified, the final integrity gate
+passed, and the recomputed client-local/common-test metrics matched the archived
+reference within the frozen absolute tolerance (`1e-6`).
+This validates the vertical slice for the exact frozen artifacts and pinned
+environment; checkpoint download publication remains a separate release task.
