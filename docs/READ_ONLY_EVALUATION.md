@@ -22,9 +22,11 @@ entry points.
 - It accepts only the experiment above and hard-binds the checkpoint and
   pretrained-model identities in the evaluator code; caller-supplied index or
   reference files cannot authorize a different `.pt` payload.
-- It verifies the checkpoint size/SHA-256, pretrained-model SHA-256, immutable
-  split-manifest SHA-256, archived-result size/SHA-256, test annotation SHA-256,
-  and all 2,241 test-image SHA-256 values before model construction.
+- In author-side mode it verifies the immutable schema-v7 split and optional
+  archived result. In public mode it verifies the code-pinned, path-free replay
+  manifest. Both modes verify the checkpoint and pretrained-model identities,
+  test annotation SHA-256, and all 2,241 test-image SHA-256 values before model
+  construction.
 - It uses `torch.load(..., map_location="cpu", weights_only=True)` with no
   fallback, as defense in depth only. This is **not** a sandbox or a safe way
   to inspect an untrusted PyTorch file; the pinned historical PyTorch runtime
@@ -58,13 +60,13 @@ schema-v7 manifest and checkpoint. This is not a full data-provenance reaudit.
 | `rtdetr-l.pt` | `6de60b10d4bc566f00cda0f5b4d64afe4b66d48dc9695d2171effb7859d8e73f` |
 | `split_official_v6_dirichlet_a0.4_c3_s42.json` | `74a45a37f4b05c474564993ff15f5548875f3e767abc19a0d2d30f195e1754c5` |
 | archived `fl_results.json` | `ed2b53790bc3a44a157ce61f078332723be388744af54ec315cac3badbfa2c4d`, 5,297,013 bytes |
-| committed evaluation reference | `20219c96fc2f3767f8fa9aee96d5d4ee7b7bbd9efc5ce750112f8e512c6b1600` |
+| public replay manifest | `ffe7b2932dfcfb0027a8e607abb3d8d5c8a5241d549b280524b77be5f3b44c88`, 472,024 bytes |
+| committed evaluation reference | `5990f1e0141c4cd883c83ad35aff45bb29de1df438f27cf40fd95476f58b18ec` |
 
-The checkpoint index and compact expected-metric record are committed as
-`artifacts/checkpoint_index.json` and
-`artifacts/evaluation_reference_seed42_fedsa_lora_r8_a04.json`. The checkpoint,
-complete split manifest, archived result and pretrained weight are not embedded
-in ordinary Git history.
+The checkpoint index, compact expected-metric record, and path-free replay
+manifest are committed under `artifacts/`. The checkpoint, complete split
+manifest, archived result and pretrained weight are not embedded in ordinary
+Git history.
 
 ## Artifact-host acceptance command
 
@@ -130,3 +132,19 @@ passed, and the recomputed client-local/common-test metrics matched the archived
 reference within the frozen absolute tolerance (`1e-6`).
 This validates the vertical slice for the exact frozen artifacts and pinned
 environment; checkpoint download publication remains a separate release task.
+
+## Public replay mode
+
+`--replay-manifest` is mutually exclusive with the author-side `--split-file`.
+It removes the need to publish the historical path-bearing schema-v7 manifest.
+`--reference-result` is also optional in this mode: recomputed metrics are
+compared with the hash-pinned compact evaluation reference, while the report
+explicitly records `archived_result_verified: false`.
+
+The committed replay manifest is ready, but the final command is intentionally
+not presented as a completed public download yet. The release builder creates a
+path-sanitized checkpoint whose file SHA-256 differs from the historical source.
+That new identity must first be generated, reviewed, pinned in this evaluator,
+and accepted on the GPU. See the staged
+[representative release procedure](REPRESENTATIVE_RELEASE.md). Until that gate
+is complete, use the author-side command above for the historical checkpoint.

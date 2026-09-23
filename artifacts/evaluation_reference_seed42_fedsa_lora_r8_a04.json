@@ -6,6 +6,11 @@
   "display_name": "FedLoRA-A (Share-A / local B)",
   "metric_scale": "0_to_1",
   "absolute_tolerance": 1e-06,
+  "public_replay_manifest": {
+    "file_name": "seed_42__fl_fedsa_lora_r8_a0.4__replay_manifest.json",
+    "bytes": 472024,
+    "sha256": "ffe7b2932dfcfb0027a8e607abb3d8d5c8a5241d549b280524b77be5f3b44c88"
+  },
   "checkpoint": {
     "release_asset_name": "seed_42__fl_fedsa_lora_r8_a0.4__best_federated.pt",
     "historical_project_relative_path": "results/official_v6/seed_42/fl_fedsa_lora_r8_a0.4/weights/best_federated.pt",

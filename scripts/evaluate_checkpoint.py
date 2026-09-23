@@ -16,6 +16,7 @@ messages go to stderr.  No persistent output option is provided by design.
 from __future__ import annotations
 
 import argparse
+import copy
 import contextlib
 import hashlib
 import json
@@ -59,7 +60,7 @@ FROZEN_ARCHIVED_RESULT_SHA256 = (
     "ed2b53790bc3a44a157ce61f078332723be388744af54ec315cac3badbfa2c4d"
 )
 FROZEN_REFERENCE_SHA256 = (
-    "20219c96fc2f3767f8fa9aee96d5d4ee7b7bbd9efc5ce750112f8e512c6b1600"
+    "5990f1e0141c4cd883c83ad35aff45bb29de1df438f27cf40fd95476f58b18ec"
 )
 FROZEN_AUGMENTATION_PROTOCOL = {
     "implementation": "ultralytics_8.4.126_RTDETRDataset",
@@ -394,11 +395,21 @@ def _validate_reference(reference: dict, record: dict) -> dict:
     pretrained = reference.get("pretrained_model")
     split = reference.get("split_manifest")
     archived = reference.get("archived_result")
+    public_replay = reference.get("public_replay_manifest")
     expected = reference.get("expected")
     if not all(isinstance(value, dict) for value in (
-        checkpoint, pretrained, split, archived, expected
+        checkpoint, pretrained, split, archived, public_replay, expected
     )):
         raise EvaluationError("Evaluation reference is incomplete")
+    if (
+        public_replay.get("file_name")
+        != "seed_42__fl_fedsa_lora_r8_a0.4__replay_manifest.json"
+        or not _is_sha256(public_replay.get("sha256"))
+        or isinstance(public_replay.get("bytes"), bool)
+        or not isinstance(public_replay.get("bytes"), int)
+        or public_replay["bytes"] <= 0
+    ):
+        raise EvaluationError("Evaluation reference public replay identity is invalid")
     cross_checks = {
         "release_asset_name": (
             checkpoint.get("release_asset_name"), record.get("release_asset_name")
@@ -711,8 +722,166 @@ def _stat_signature(path: Path) -> tuple:
     )
 
 
+def _require_exact_keys(value: Any, keys: set, label: str) -> dict:
+    if not isinstance(value, dict):
+        raise EvaluationError(f"{label} must be a JSON object")
+    observed = set(value)
+    if observed != keys:
+        raise EvaluationError(
+            f"{label} keys differ from the public replay schema: "
+            f"missing={sorted(keys - observed)}, extra={sorted(observed - keys)}"
+        )
+    return value
+
+
+def _public_replay_as_validation_manifest(
+    replay: dict, manifest_reference: dict
+) -> dict:
+    """Validate the compact public schema and adapt it to the legacy validator.
+
+    Train/validation image IDs are intentionally not public because inference
+    only needs their frozen per-client counts.  The legacy validator receives
+    count-only blocks for those splits and still validates every test ID/hash.
+    """
+
+    replay = _require_exact_keys(
+        replay,
+        {
+            "schema_version", "protocol", "experiment_id",
+            "historical_split_manifest", "partition_protocol", "split_counts",
+            "client_image_counts", "test",
+        },
+        "public replay manifest",
+    )
+    if replay["schema_version"] != 1:
+        raise EvaluationError("Public replay manifest must use schema_version=1")
+    if replay["protocol"] != "fedlora_representative_test_replay":
+        raise EvaluationError("Public replay manifest protocol changed")
+    if replay["experiment_id"] != TARGET_EXPERIMENT_ID:
+        raise EvaluationError("Public replay manifest targets another experiment")
+    historical = _require_exact_keys(
+        replay["historical_split_manifest"], {"schema_version", "sha256"},
+        "public replay historical split",
+    )
+    if (
+        historical["schema_version"] != FROZEN_MANIFEST_PROTOCOL["schema_version"]
+        or historical["sha256"] != FROZEN_SPLIT_SHA256
+    ):
+        raise EvaluationError("Public replay historical split identity changed")
+    if replay["partition_protocol"] != manifest_reference.get("protocol"):
+        raise EvaluationError("Public replay partition protocol changed")
+    if replay["split_counts"] != manifest_reference.get("split_counts"):
+        raise EvaluationError("Public replay aggregate split counts changed")
+    if replay["client_image_counts"] != manifest_reference.get("client_image_counts"):
+        raise EvaluationError("Public replay client image counts changed")
+
+    test = _require_exact_keys(
+        replay["test"],
+        {"annotation", "category_audit", "source_inventory", "client_image_ids"},
+        "public replay test block",
+    )
+    annotation = _require_exact_keys(
+        test["annotation"], {"relative_path", "sha256"},
+        "public replay test annotation",
+    )
+    if annotation["relative_path"] != "test/_annotations.coco.json":
+        raise EvaluationError("Public replay annotation path changed")
+    if not _is_sha256(annotation["sha256"]):
+        raise EvaluationError("Public replay annotation SHA-256 is invalid")
+    inventory = _require_exact_keys(
+        test["source_inventory"],
+        {
+            "schema_version", "identity_policy", "historical_inventory_sha256",
+            "image_tree_sha256", "records",
+        },
+        "public replay test inventory",
+    )
+    reference_inventory = manifest_reference.get("source_inventory", {})
+    inventory_checks = {
+        "schema_version": (inventory["schema_version"], 1),
+        "identity_policy": (
+            inventory["identity_policy"], reference_inventory.get("identity_policy")
+        ),
+        "historical_inventory_sha256": (
+            inventory["historical_inventory_sha256"],
+            reference_inventory.get("inventory_sha256"),
+        ),
+        "image_tree_sha256": (
+            inventory["image_tree_sha256"],
+            reference_inventory.get("test_image_tree_sha256"),
+        ),
+    }
+    mismatches = {
+        key: {"replay": left, "required": right}
+        for key, (left, right) in inventory_checks.items() if left != right
+    }
+    if mismatches:
+        raise EvaluationError(
+            "Public replay source inventory changed: "
+            + json.dumps(mismatches, sort_keys=True)
+        )
+    client_rows = test["client_image_ids"]
+    if not isinstance(client_rows, list) or len(client_rows) != 3:
+        raise EvaluationError("Public replay must contain three client test assignments")
+    ordered_rows = sorted(client_rows, key=lambda row: int(row.get("client_id", -1)))
+    if [int(row.get("client_id", -1)) for row in ordered_rows] != [0, 1, 2]:
+        raise EvaluationError("Public replay client test IDs must be 0,1,2")
+
+    counts = replay["client_image_counts"]
+    clients = []
+    for client_id, row in enumerate(ordered_rows):
+        row = _require_exact_keys(
+            row, {"client_id", "image_ids"},
+            f"public replay client {client_id} test assignment",
+        )
+        image_ids = row["image_ids"]
+        if not isinstance(image_ids, list):
+            raise EvaluationError("Public replay client image_ids must be a list")
+        clients.append({
+            "client_id": client_id,
+            "splits": {
+                "train": {"num_images": int(counts["train"][client_id])},
+                "val": {"num_images": int(counts["val"][client_id])},
+                "test": {
+                    "num_images": int(counts["test"][client_id]),
+                    "image_ids": image_ids,
+                },
+            },
+        })
+    realized = {
+        split_name: [
+            {"client_id": client_id, "num_images": int(counts[split_name][client_id])}
+            for client_id in range(3)
+        ]
+        for split_name in ("train", "val", "test")
+    }
+    metadata = {
+        **copy.deepcopy(replay["partition_protocol"]),
+        "data_root": "",
+        "annotation_sha256": {"test": annotation["sha256"]},
+        "split_counts": copy.deepcopy(replay["split_counts"]),
+        "source_split_counts": copy.deepcopy(replay["split_counts"]),
+        "realized_partition_statistics": realized,
+        "source_category_audit": {"test": copy.deepcopy(test["category_audit"])},
+        "source_hash_inventory": {
+            "schema_version": 1,
+            "identity_policy": inventory["identity_policy"],
+            "inventory_sha256": inventory["historical_inventory_sha256"],
+            "records": {"test": copy.deepcopy(inventory["records"])},
+            "per_split_image_tree_sha256": {
+                "test": inventory["image_tree_sha256"]
+            },
+        },
+    }
+    return {"metadata": metadata, "clients": clients}
+
+
 def _validate_relocated_test_data(
-    manifest: dict, data_root: Path, manifest_reference: dict
+    manifest: dict,
+    data_root: Path,
+    manifest_reference: dict,
+    *,
+    counts_only_non_test: bool = False,
 ) -> dict:
     metadata = manifest.get("metadata")
     clients = manifest.get("clients")
@@ -861,19 +1030,31 @@ def _validate_relocated_test_data(
                 raise EvaluationError(
                     f"Client {client_id} has no {split_name} split block"
                 )
-            image_ids = [int(value) for value in block.get("image_ids", [])]
             expected_client_count = expected_client_counts[split_name][client_id]
-            if len(image_ids) != len(set(image_ids)):
-                raise EvaluationError(
-                    f"Client {client_id} {split_name} assignment has duplicates"
-                )
-            if (
-                len(image_ids) != int(block.get("num_images", -1))
-                or len(image_ids) != int(expected_client_count)
-            ):
-                raise EvaluationError(
-                    f"Client {client_id} {split_name} assignment count mismatch"
-                )
+            if counts_only_non_test and split_name != "test":
+                if set(block) != {"num_images"}:
+                    raise EvaluationError(
+                        f"Public replay client {client_id} {split_name} block "
+                        "must contain only num_images"
+                    )
+                if int(block.get("num_images", -1)) != int(expected_client_count):
+                    raise EvaluationError(
+                        f"Client {client_id} {split_name} count mismatch"
+                    )
+                image_ids = []
+            else:
+                image_ids = [int(value) for value in block.get("image_ids", [])]
+                if len(image_ids) != len(set(image_ids)):
+                    raise EvaluationError(
+                        f"Client {client_id} {split_name} assignment has duplicates"
+                    )
+                if (
+                    len(image_ids) != int(block.get("num_images", -1))
+                    or len(image_ids) != int(expected_client_count)
+                ):
+                    raise EvaluationError(
+                        f"Client {client_id} {split_name} assignment count mismatch"
+                    )
             assignments[split_name].append(image_ids)
             realized_rows = realized.get(split_name)
             if not isinstance(realized_rows, list) or len(realized_rows) != 3:
@@ -897,6 +1078,8 @@ def _validate_relocated_test_data(
             "test": int(expected_client_counts["test"][client_id]),
         })
     for split_name, per_client in assignments.items():
+        if counts_only_non_test and split_name != "test":
+            continue
         flattened = [image_id for values in per_client for image_id in values]
         if (
             len(flattened) != len(set(flattened))
@@ -1381,9 +1564,24 @@ def _build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--checkpoint", type=Path, required=True)
     parser.add_argument("--checkpoint-index", type=Path, default=DEFAULT_INDEX)
     parser.add_argument("--reference", type=Path, default=DEFAULT_REFERENCE)
-    parser.add_argument("--reference-result", type=Path, required=True)
+    parser.add_argument(
+        "--reference-result",
+        type=Path,
+        help=(
+            "Optional immutable historical result JSON for author-side provenance "
+            "verification. Public replay uses the code-pinned compact reference."
+        ),
+    )
     parser.add_argument("--model-weights", type=Path, required=True)
-    parser.add_argument("--split-file", type=Path, required=True)
+    manifests = parser.add_mutually_exclusive_group(required=True)
+    manifests.add_argument(
+        "--split-file", type=Path,
+        help="Original schema-v7 split manifest (legacy author-side audit mode)",
+    )
+    manifests.add_argument(
+        "--replay-manifest", type=Path,
+        help="Path-free public replay manifest distributed with the checkpoint",
+    )
     parser.add_argument("--data-root", type=Path, required=True)
     parser.add_argument("--device", default="cuda:0")
     parser.add_argument(
@@ -1399,18 +1597,31 @@ def evaluate(argv: Optional[List[str]] = None, *, evaluator=None) -> tuple[int, 
     checkpoint = _require_file(args.checkpoint, "checkpoint")
     index_path = _require_file(args.checkpoint_index, "checkpoint index")
     reference_path = _require_file(args.reference, "evaluation reference")
-    reference_result_path = _require_file(args.reference_result, "archived result")
+    reference_result_path = (
+        _require_file(args.reference_result, "archived result")
+        if args.reference_result is not None else None
+    )
     model_weights = _require_file(args.model_weights, "pretrained model")
-    split_file = _require_file(args.split_file, "split manifest")
+    historical_mode = args.split_file is not None
+    if historical_mode and reference_result_path is None:
+        raise EvaluationError(
+            "--reference-result is required with the historical --split-file mode"
+        )
+    manifest_path = _require_file(
+        args.split_file if historical_mode else args.replay_manifest,
+        "split manifest" if historical_mode else "public replay manifest",
+    )
     data_root = _require_directory(args.data_root, "data root")
     test_root = _require_directory(data_root / "test", "relocated test split")
     annotation_path = _require_file(
         test_root / "_annotations.coco.json", "test annotation"
     )
-    protected_paths = (
-        checkpoint, index_path, reference_path, reference_result_path,
-        model_weights, split_file, annotation_path,
-    )
+    protected_paths = [
+        checkpoint, index_path, reference_path, model_weights, manifest_path,
+        annotation_path,
+    ]
+    if reference_result_path is not None:
+        protected_paths.append(reference_result_path)
     # Capture the baseline before parsing, hashing, or deserializing any input.
     # This closes the verification-to-snapshot gap and makes failures auditable.
     protected_before = _snapshot_protected(protected_paths)
@@ -1441,31 +1652,51 @@ def evaluate(argv: Optional[List[str]] = None, *, evaluator=None) -> tuple[int, 
             label="pretrained model",
             expected_sha256=FROZEN_PRETRAINED_SHA256,
         )
-        split_record = _verify_file(
-            split_file,
-            label="split manifest",
-            expected_sha256=FROZEN_SPLIT_SHA256,
-        )
-        archived_record = _verify_file(
-            reference_result_path,
-            label="archived result",
-            expected_sha256=FROZEN_ARCHIVED_RESULT_SHA256,
-            expected_bytes=FROZEN_ARCHIVED_RESULT_BYTES,
-        )
-        archived_metrics = _normalize_archived_result(
-            _load_json(reference_result_path, "archived result"),
-            reference["checkpoint"],
-        )
         tolerance = float(reference["absolute_tolerance"])
-        _assert_metrics_equal(
-            archived_metrics,
-            reference["expected"],
-            tolerance=1e-12,
-            label="Archived result",
-        )
-        manifest = _load_json(split_file, "split manifest")
+        archived_record = None
+        if reference_result_path is not None:
+            archived_record = _verify_file(
+                reference_result_path,
+                label="archived result",
+                expected_sha256=FROZEN_ARCHIVED_RESULT_SHA256,
+                expected_bytes=FROZEN_ARCHIVED_RESULT_BYTES,
+            )
+            archived_metrics = _normalize_archived_result(
+                _load_json(reference_result_path, "archived result"),
+                reference["checkpoint"],
+            )
+            _assert_metrics_equal(
+                archived_metrics,
+                reference["expected"],
+                tolerance=1e-12,
+                label="Archived result",
+            )
+        if historical_mode:
+            manifest_record = _verify_file(
+                manifest_path,
+                label="split manifest",
+                expected_sha256=FROZEN_SPLIT_SHA256,
+            )
+            manifest = _load_json(manifest_path, "split manifest")
+            counts_only_non_test = False
+        else:
+            replay_identity = reference["public_replay_manifest"]
+            manifest_record = _verify_file(
+                manifest_path,
+                label="public replay manifest",
+                expected_sha256=replay_identity["sha256"],
+                expected_bytes=replay_identity["bytes"],
+            )
+            manifest = _public_replay_as_validation_manifest(
+                _load_json(manifest_path, "public replay manifest"),
+                reference["split_manifest"],
+            )
+            counts_only_non_test = True
         data_spec = _validate_relocated_test_data(
-            manifest, data_root, reference["split_manifest"]
+            manifest,
+            data_root,
+            reference["split_manifest"],
+            counts_only_non_test=counts_only_non_test,
         )
 
         # Refuse to begin model construction if any input changed while the
@@ -1494,7 +1725,7 @@ def evaluate(argv: Optional[List[str]] = None, *, evaluator=None) -> tuple[int, 
                 runtime_data = _build_temporary_data_info(
                     data_spec,
                     manifest,
-                    split_record["sha256"],
+                    FROZEN_SPLIT_SHA256,
                     runtime_root / "test_only_data",
                 )
                 with _redirect_all_stdout_to_stderr():
@@ -1502,7 +1733,7 @@ def evaluate(argv: Optional[List[str]] = None, *, evaluator=None) -> tuple[int, 
                         checkpoint=trusted_checkpoint,
                         record=record,
                         model_weights=trusted_model_weights,
-                        split_file=split_file,
+                        split_file=manifest_path,
                         data_root=data_root,
                         data_info=runtime_data,
                         device=args.device,
@@ -1524,8 +1755,15 @@ def evaluate(argv: Optional[List[str]] = None, *, evaluator=None) -> tuple[int, 
                         "temporary_test_only_data": True,
                         "private_verified_model_copies": True,
                         "persistent_outputs": False,
-                        "historical_data_root": data_spec["historical_data_root"],
-                        "relocated_data_root_used": str(data_root),
+                        "historical_data_root": (
+                            data_spec["historical_data_root"] if historical_mode else None
+                        ),
+                        "relocated_data_root_used": (
+                            str(data_root) if historical_mode else None
+                        ),
+                        "manifest_mode": (
+                            "historical_schema_v7" if historical_mode else "public_replay"
+                        ),
                     },
                     "inputs": {
                         "checkpoint": checkpoint_record,
@@ -1536,8 +1774,13 @@ def evaluate(argv: Optional[List[str]] = None, *, evaluator=None) -> tuple[int, 
                         },
                         "evaluation_reference": reference_file_record,
                         "pretrained_model": model_record,
-                        "split_manifest": split_record,
+                        "historical_split_manifest_sha256": FROZEN_SPLIT_SHA256,
+                        (
+                            "split_manifest" if historical_mode
+                            else "public_replay_manifest"
+                        ): manifest_record,
                         "archived_result": archived_record,
+                        "archived_result_verified": archived_record is not None,
                         "test_annotation": data_spec["annotation_record"],
                         "test_image_tree_sha256": data_spec["image_tree_sha256"],
                         "test_images_verified": len(data_spec["image_paths"]),

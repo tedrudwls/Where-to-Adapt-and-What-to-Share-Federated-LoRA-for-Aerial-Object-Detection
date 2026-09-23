@@ -66,6 +66,8 @@ scripts/run_heterogeneity_cell.sh   IID and Dirichlet α=0.1 cells
 scripts/mia_*audit.py               read-only endpoint-MIA sensitivity analyses
 scripts/verify_checkpoint_assets.py read-only 96-checkpoint SHA-256 check
 scripts/evaluate_checkpoint.py      P0 read-only representative-checkpoint AP replay
+scripts/build_representative_release_bundle.py  path-sanitized minimal release builder
+scripts/verify_representative_release_bundle.py safe outer/inner release verification
 ```
 
 The evaluator's exact artifact hashes, safety boundary and artifact-host
@@ -81,6 +83,7 @@ The reported runs used Python 3.9.18, PyTorch 2.5.1+cu124, torchvision 0.20.1, a
 - Download the public [AOD-4 dataset (Mendeley Data, Version 1)](https://doi.org/10.17632/cd5z895tr2.1) and use the historical AOD-4 v6 COCO export membership: 15,761 train, 4,514 validation, and 2,241 test images. The raw images are **not redistributed here**. See [Dataset and splits](docs/DATASET.md).
 - A compact summary and SHA-256 inventory of nine historical schema-v7 split manifests are preserved under [`provenance/splits/`](provenance/splits/) for audit. The complete manifests are a pending separate artifact; they contain original-server paths and must **not** be edited in place. Regenerate local splits for a different data root.
 - The [selected-checkpoint index](artifacts/checkpoint_index.json) covers 96 validation-selected models (4,554,894,872 bytes in total). A user-reported read-only server check verified all 96 against their recorded sizes and SHA-256 values; **public downloads are still pending**. See [Checkpoints](docs/CHECKPOINTS.md).
+- The first publication gate is a [minimal representative replay bundle](docs/REPRESENTATIVE_RELEASE.md): one path-sanitized personalized checkpoint plus a committed path-free test manifest. AOD-4 images and `rtdetr-l.pt` remain external. The bundle is not called public until a GitHub Release asset has passed clean re-download and GPU replay.
 - The 96 complete result JSONs, their derived tables, and the frozen MIA audit are separate research artifacts. The received JSON archive's [SHA-256](artifacts/result_bundle_sha256.txt) is recorded, but its publication location and immutable release identifier will be added only after upload and verification.
 - The [server-source comparison](provenance/SERVER_SOURCE_COMPARISON.md) distinguishes byte-identical experiment code from five documented release-only portability/comment edits; recovery/evidence utilities are a separate pending review.
 - The [held-out qualitative protocol](docs/QUALITATIVE_TEST.md) documents the seed-43/client-1 zero-local-training-support case, the ground-truth-only p10/p50/p90 selection rule, and the reporting boundaries. The README displays the p10 and p50 static figures; the frozen, path-sanitized selection and prediction record is available as [qualitative metadata](artifacts/qualitative_unseen_helicopter_s43_c1.json). No additional case-specific visualization code is required to interpret the committed figures.
@@ -99,6 +102,7 @@ The official export has 281 key/hash-connected source components spanning at lea
 | `tests/` | Unit/regression tests |
 | `provenance/splits/` | Compact historical split summary and full-manifest SHA-256 inventory |
 | `artifacts/checkpoint_index.json` | Expected checkpoint SHA-256, size and experiment ID; no binaries |
+| `artifacts/*replay_manifest.json` | Path-free, hash-pinned representative test replay metadata |
 | `docs/` | Reproduction, data, results, checkpoint and audit documentation |
 
 ## Citation and license
