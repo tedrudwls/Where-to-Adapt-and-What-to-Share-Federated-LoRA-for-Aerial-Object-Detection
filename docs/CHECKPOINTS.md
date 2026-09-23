@@ -12,20 +12,21 @@ The recorded pretrained model SHA-256 is:
 6de60b10d4bc566f00cda0f5b4d64afe4b66d48dc9695d2171effb7859d8e73f  rtdetr-l.pt
 ```
 
-On the historical server, run a **read-only** inventory check from the project root before any packaging or upload:
+On the artifact host, run a **read-only** inventory check from the project root before any packaging or upload:
 
 ```bash
+PROJECT_DIR=/path/to/this/repository
 python3 scripts/verify_checkpoint_assets.py \
-  --project-dir /home/gpuadmin/kim/fedsalora
-sha256sum /home/gpuadmin/kim/fedsalora/rtdetr-l.pt
+  --project-dir "$PROJECT_DIR"
+sha256sum "$PROJECT_DIR/rtdetr-l.pt"
 ```
 
-The user ran this verifier on the historical server using draft PR code and reported `[PASS] checkpoints 96/96 verified; bytes=4554894872`; the pretrained SHA-256 also matched the recorded value. The verifier does not rewrite checkpoints, result JSONs, or split manifests. Repeat this check immediately before asset upload, then compare every public download to the index. Never load an untrusted PyTorch pickle checkpoint: `torch.load` can execute code.
+The user ran this verifier on the artifact host using draft PR code and reported `[PASS] checkpoints 96/96 verified; bytes=4554894872`; the pretrained SHA-256 also matched the recorded value. The verifier does not rewrite checkpoints, result JSONs, or split manifests. Repeat this check immediately before asset upload, then compare every public download to the index. Never load an untrusted PyTorch pickle checkpoint: `torch.load` can execute code.
 
 ## Model-state semantics
 
 `best_full.pt` files are full selected solo/centralized detector states. `best_federated.pt` files are federated selected states; factor-sharing methods require the recorded client-specific factor states for personalized evaluation. The pretrained base checkpoint and the exact code/dependency version are required to rebuild LoRA models correctly. A selected checkpoint contains state needed for **inference/evaluation**, not exact resumption of training: optimizer moments, scheduler phase and all RNG states are not supplied as a complete restart snapshot. Selected rounds/epochs are chosen by validation performance; test data did not choose them.
 
-The public [qualitative record](QUALITATIVE_TEST.md) consists of two static seed-43/client-1 figures and path-sanitized metadata for three validation-selected rank-8 endpoints. It is not a general checkpoint evaluation or AP recomputation interface. Do not use `main.py --resume` against archived primary directories as an evaluation shortcut: that path writes evaluation manifests, logs, plots and result JSONs. The existing data validator also binds a manifest to its original absolute data root and generated YOLO tree digests. Evaluation on a relocated checkout needs a separately validated relocation/reconstruction protocol, or a path-equivalent historical data tree. This is a release gate, not a reason to modify old manifests in place.
+The public [qualitative record](QUALITATIVE_TEST.md) consists of two static seed-43/client-1 figures and path-sanitized metadata for three validation-selected rank-8 endpoints. It is not a general checkpoint evaluation or AP recomputation interface. Do not use `main.py --resume` against archived primary directories as an evaluation shortcut: that path writes evaluation manifests, logs, plots and result JSONs. A separate [read-only evaluation vertical slice](READ_ONLY_EVALUATION.md) now implements temporary test-only reconstruction for the indexed seed-42 FedLoRA-A checkpoint without editing the path-bound historical manifest. Its model/GPU path must pass the documented artifact-host acceptance command before the release gate is closed.
 
-The 96 checkpoint files are on the historical training server and passed the user-reported server-side checksum check, but have **not yet been published as download assets or independently rehashed after download**. Links will be added only after publication and public-download verification. Until then, do not interpret an index record as proof that the corresponding binary is publicly available.
+The 96 checkpoint files are on the private artifact host and passed the user-reported host-side checksum check, but have **not yet been published as download assets or independently rehashed after download**. Links will be added only after publication and public-download verification. Until then, do not interpret an index record as proof that the corresponding binary is publicly available.
