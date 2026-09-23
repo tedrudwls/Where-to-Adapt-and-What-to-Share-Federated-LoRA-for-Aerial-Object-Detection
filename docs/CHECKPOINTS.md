@@ -29,6 +29,13 @@ The user ran this verifier on the artifact host using draft PR code and reported
 
 The public [qualitative record](QUALITATIVE_TEST.md) consists of two static seed-43/client-1 figures and path-sanitized metadata for three validation-selected rank-8 endpoints. It is not a general checkpoint evaluation or AP recomputation interface. Do not use `main.py --resume` against archived primary directories as an evaluation shortcut: that path writes evaluation manifests, logs, plots and result JSONs. A separate [read-only evaluation vertical slice](READ_ONLY_EVALUATION.md) implements temporary test-only reconstruction for the indexed seed-42 FedLoRA-A checkpoint without editing the path-bound historical manifest. The authors report that its pinned GPU/model path passed the documented artifact-host acceptance command on 2026-09-23.
 
+The next release stage is the separate
+[paper-core checkpoint set](PAPER_CORE_RELEASE.md): Full FT, FedLoRA-AB,
+FedLoRA-A and FedLoRA-B for seeds 42/43/44 under the primary alpha-0.4
+protocol. It is an exact 12-checkpoint subset of this index and does not replace
+the representative replay artifact or imply that all 96 checkpoints have been
+published.
+
 The 96 checkpoint files are on the private artifact host and passed the user-reported host-side checksum check, but have **not yet been published as download assets or independently rehashed after download**. Links will be added only after publication and public-download verification. Until then, do not interpret an index record as proof that the corresponding binary is publicly available.
 
 ## Minimal representative release gate

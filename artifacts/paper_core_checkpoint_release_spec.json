@@ -1,0 +1,237 @@
+{
+  "schema_version": 1,
+  "release_id": "paper-core-checkpoints-v1.0.0",
+  "status": "public_identity_discovery_required",
+  "description": "Exact historical allowlist for the 12-checkpoint paper-core release. Public file identities remain null until the read-only discovery report is reviewed and committed.",
+  "checkpoint_index": {
+    "path": "artifacts/checkpoint_index.json",
+    "sha256": "f2b630085df03dfcf04e4ebac2b973968d8b28b3674354f47e4ab4805556c068"
+  },
+  "protocol": {
+    "mode": "fl",
+    "partition": "dirichlet",
+    "dirichlet_alpha": 0.4,
+    "client_count": 3,
+    "training_seeds": [
+      42,
+      43,
+      44
+    ],
+    "partition_seed_equals_training_seed": true,
+    "lora_rank": 8,
+    "lora_targets": "backbone_and_decoder"
+  },
+  "external_pretrained_model": {
+    "included": false,
+    "file_name": "rtdetr-l.pt",
+    "sha256": "6de60b10d4bc566f00cda0f5b4d64afe4b66d48dc9695d2171effb7859d8e73f"
+  },
+  "expected_record_count": 12,
+  "historical_total_bytes": 423860180,
+  "records": [
+    {
+      "experiment_id": "seed_42/fl_full_ft_a0.4",
+      "paper_method": "FL Full FT",
+      "internal_method": "full_ft",
+      "training_seed": 42,
+      "partition_seed": 42,
+      "rank": null,
+      "selected_round": 19,
+      "split_manifest_sha256": "74a45a37f4b05c474564993ff15f5548875f3e767abc19a0d2d30f195e1754c5",
+      "historical": {
+        "project_relative_path": "results/official_v6/seed_42/fl_full_ft_a0.4/weights/best_federated.pt",
+        "bytes": 131947288,
+        "sha256": "79d937ea780e611ad3f93655d3fd7399293f0b3aaf3c4a1240b5a196236d426c"
+      },
+      "public_file_name": "seed_42__fl_full_ft_a0.4__best_federated.pt",
+      "public_identity": null
+    },
+    {
+      "experiment_id": "seed_42/fl_lora_r8_a0.4",
+      "paper_method": "FedLoRA-AB",
+      "internal_method": "lora",
+      "training_seed": 42,
+      "partition_seed": 42,
+      "rank": 8,
+      "selected_round": 20,
+      "split_manifest_sha256": "74a45a37f4b05c474564993ff15f5548875f3e767abc19a0d2d30f195e1754c5",
+      "historical": {
+        "project_relative_path": "results/official_v6/seed_42/fl_lora_r8_a0.4/weights/best_federated.pt",
+        "bytes": 1930556,
+        "sha256": "05ca4d38d7a3632dec54c6592da8d58bd5951f6fb11744b4d212fee6f1c618b3"
+      },
+      "public_file_name": "seed_42__fl_lora_r8_a0.4__best_federated.pt",
+      "public_identity": null
+    },
+    {
+      "experiment_id": "seed_42/fl_fedsa_lora_r8_a0.4",
+      "paper_method": "FedLoRA-A",
+      "internal_method": "fedsa_lora",
+      "training_seed": 42,
+      "partition_seed": 42,
+      "rank": 8,
+      "selected_round": 20,
+      "split_manifest_sha256": "74a45a37f4b05c474564993ff15f5548875f3e767abc19a0d2d30f195e1754c5",
+      "historical": {
+        "project_relative_path": "results/official_v6/seed_42/fl_fedsa_lora_r8_a0.4/weights/best_federated.pt",
+        "bytes": 3316516,
+        "sha256": "3ed025419506009465add698da75fef941c20c0b16eb347bb224820781b9cac4"
+      },
+      "public_file_name": "seed_42__fl_fedsa_lora_r8_a0.4__best_federated.pt",
+      "public_identity": null
+    },
+    {
+      "experiment_id": "seed_42/fl_fixed_share_b_lora_r8_a0.4",
+      "paper_method": "FedLoRA-B",
+      "internal_method": "fixed_share_b_lora",
+      "training_seed": 42,
+      "partition_seed": 42,
+      "rank": 8,
+      "selected_round": 20,
+      "split_manifest_sha256": "74a45a37f4b05c474564993ff15f5548875f3e767abc19a0d2d30f195e1754c5",
+      "historical": {
+        "project_relative_path": "results/official_v6/seed_42/fl_fixed_share_b_lora_r8_a0.4/weights/best_federated.pt",
+        "bytes": 4093860,
+        "sha256": "6092d9500de123a1ce7f16ff3c0290c2bff02911bf1ffb0efa78e096d00c6c7d"
+      },
+      "public_file_name": "seed_42__fl_fixed_share_b_lora_r8_a0.4__best_federated.pt",
+      "public_identity": null
+    },
+    {
+      "experiment_id": "seed_43/fl_full_ft_a0.4",
+      "paper_method": "FL Full FT",
+      "internal_method": "full_ft",
+      "training_seed": 43,
+      "partition_seed": 43,
+      "rank": null,
+      "selected_round": 20,
+      "split_manifest_sha256": "728f9e3e25f723b69633cd6ec80a954a7c2c61912287774839032ef9611b3afa",
+      "historical": {
+        "project_relative_path": "results/official_v6/seed_43/fl_full_ft_a0.4/weights/best_federated.pt",
+        "bytes": 131947288,
+        "sha256": "a9a417d0a416e970361df56dd95fca234958c5384ba637e0ad5a922e33be149a"
+      },
+      "public_file_name": "seed_43__fl_full_ft_a0.4__best_federated.pt",
+      "public_identity": null
+    },
+    {
+      "experiment_id": "seed_43/fl_lora_r8_a0.4",
+      "paper_method": "FedLoRA-AB",
+      "internal_method": "lora",
+      "training_seed": 43,
+      "partition_seed": 43,
+      "rank": 8,
+      "selected_round": 20,
+      "split_manifest_sha256": "728f9e3e25f723b69633cd6ec80a954a7c2c61912287774839032ef9611b3afa",
+      "historical": {
+        "project_relative_path": "results/official_v6/seed_43/fl_lora_r8_a0.4/weights/best_federated.pt",
+        "bytes": 1930556,
+        "sha256": "ad928c84c5f1a82f7f88334ce5825422d1249bd59cb934eaeb3ddac3a751ff02"
+      },
+      "public_file_name": "seed_43__fl_lora_r8_a0.4__best_federated.pt",
+      "public_identity": null
+    },
+    {
+      "experiment_id": "seed_43/fl_fedsa_lora_r8_a0.4",
+      "paper_method": "FedLoRA-A",
+      "internal_method": "fedsa_lora",
+      "training_seed": 43,
+      "partition_seed": 43,
+      "rank": 8,
+      "selected_round": 20,
+      "split_manifest_sha256": "728f9e3e25f723b69633cd6ec80a954a7c2c61912287774839032ef9611b3afa",
+      "historical": {
+        "project_relative_path": "results/official_v6/seed_43/fl_fedsa_lora_r8_a0.4/weights/best_federated.pt",
+        "bytes": 3316516,
+        "sha256": "c0ebf42091e3381c933a824c0b53f993af72c016c2e5015105ef90889448c616"
+      },
+      "public_file_name": "seed_43__fl_fedsa_lora_r8_a0.4__best_federated.pt",
+      "public_identity": null
+    },
+    {
+      "experiment_id": "seed_43/fl_fixed_share_b_lora_r8_a0.4",
+      "paper_method": "FedLoRA-B",
+      "internal_method": "fixed_share_b_lora",
+      "training_seed": 43,
+      "partition_seed": 43,
+      "rank": 8,
+      "selected_round": 6,
+      "split_manifest_sha256": "728f9e3e25f723b69633cd6ec80a954a7c2c61912287774839032ef9611b3afa",
+      "historical": {
+        "project_relative_path": "results/official_v6/seed_43/fl_fixed_share_b_lora_r8_a0.4/weights/best_federated.pt",
+        "bytes": 4093796,
+        "sha256": "f454435dc0a37530c919ccfff921ddfbe84fb18bc1919477cad186fdf513116d"
+      },
+      "public_file_name": "seed_43__fl_fixed_share_b_lora_r8_a0.4__best_federated.pt",
+      "public_identity": null
+    },
+    {
+      "experiment_id": "seed_44/fl_full_ft_a0.4",
+      "paper_method": "FL Full FT",
+      "internal_method": "full_ft",
+      "training_seed": 44,
+      "partition_seed": 44,
+      "rank": null,
+      "selected_round": 19,
+      "split_manifest_sha256": "1bbbaece99f32c320de2505f3c83dbfa9b323170bab56b0f43a5c876d6da55b3",
+      "historical": {
+        "project_relative_path": "results/official_v6/seed_44/fl_full_ft_a0.4/weights/best_federated.pt",
+        "bytes": 131946200,
+        "sha256": "d1b668e1fe50b07fbd3eb079cefb5eeb087fc39dd81fa46bf6ece356572a2f21"
+      },
+      "public_file_name": "seed_44__fl_full_ft_a0.4__best_federated.pt",
+      "public_identity": null
+    },
+    {
+      "experiment_id": "seed_44/fl_lora_r8_a0.4",
+      "paper_method": "FedLoRA-AB",
+      "internal_method": "lora",
+      "training_seed": 44,
+      "partition_seed": 44,
+      "rank": 8,
+      "selected_round": 20,
+      "split_manifest_sha256": "1bbbaece99f32c320de2505f3c83dbfa9b323170bab56b0f43a5c876d6da55b3",
+      "historical": {
+        "project_relative_path": "results/official_v6/seed_44/fl_lora_r8_a0.4/weights/best_federated.pt",
+        "bytes": 1929468,
+        "sha256": "f08d4926f15b0b8569ed080d228bee4df61aa55c0aa690b3d28e3f0f337c65e6"
+      },
+      "public_file_name": "seed_44__fl_lora_r8_a0.4__best_federated.pt",
+      "public_identity": null
+    },
+    {
+      "experiment_id": "seed_44/fl_fedsa_lora_r8_a0.4",
+      "paper_method": "FedLoRA-A",
+      "internal_method": "fedsa_lora",
+      "training_seed": 44,
+      "partition_seed": 44,
+      "rank": 8,
+      "selected_round": 20,
+      "split_manifest_sha256": "1bbbaece99f32c320de2505f3c83dbfa9b323170bab56b0f43a5c876d6da55b3",
+      "historical": {
+        "project_relative_path": "results/official_v6/seed_44/fl_fedsa_lora_r8_a0.4/weights/best_federated.pt",
+        "bytes": 3315428,
+        "sha256": "9a794154670112920c77b893693c16c2969a002f036d19158604acd61ca62e97"
+      },
+      "public_file_name": "seed_44__fl_fedsa_lora_r8_a0.4__best_federated.pt",
+      "public_identity": null
+    },
+    {
+      "experiment_id": "seed_44/fl_fixed_share_b_lora_r8_a0.4",
+      "paper_method": "FedLoRA-B",
+      "internal_method": "fixed_share_b_lora",
+      "training_seed": 44,
+      "partition_seed": 44,
+      "rank": 8,
+      "selected_round": 20,
+      "split_manifest_sha256": "1bbbaece99f32c320de2505f3c83dbfa9b323170bab56b0f43a5c876d6da55b3",
+      "historical": {
+        "project_relative_path": "results/official_v6/seed_44/fl_fixed_share_b_lora_r8_a0.4/weights/best_federated.pt",
+        "bytes": 4092708,
+        "sha256": "6bf78aaa35fd214f95d9fb4462fb54ae37171bc08c9e2a7f1085d96e9708562c"
+      },
+      "public_file_name": "seed_44__fl_fixed_share_b_lora_r8_a0.4__best_federated.pt",
+      "public_identity": null
+    }
+  ]
+}
