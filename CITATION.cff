@@ -1,0 +1,33 @@
+cff-version: 1.2.0
+message: >-
+  If you use this software, please cite it using the metadata below.
+  Gyeongjin Kim and Yeongjin Jeon contributed equally; Hyukjin Kwon is
+  the corresponding author. A preferred paper citation will be added
+  after the manuscript receives a persistent identifier.
+title: "Where to Adapt and What to Share: Federated LoRA for Aerial Object Detection"
+type: software
+authors:
+  - family-names: Kim
+    given-names: Gyeongjin
+  - family-names: Jeon
+    given-names: Yeongjin
+  - family-names: Park
+    given-names: Jae Kwan
+  - family-names: Chae
+    given-names: Yuhyun
+  - family-names: Kwon
+    given-names: Hyukjin
+repository-code: "https://github.com/tedrudwls/Where-to-Adapt-and-What-to-Share-Federated-LoRA-for-Aerial-Object-Detection"
+url: "https://github.com/tedrudwls/Where-to-Adapt-and-What-to-Share-Federated-LoRA-for-Aerial-Object-Detection"
+license: AGPL-3.0-only
+abstract: >-
+  Research code and reproducibility materials for an RT-DETR-L study of
+  LoRA adapter placement and factor sharing in federated aerial-object
+  detection under heterogeneous client label distributions.
+keywords:
+  - federated learning
+  - low-rank adaptation
+  - object detection
+  - RT-DETR
+  - aerial imagery
+  - parameter-efficient fine-tuning

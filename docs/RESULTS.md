@@ -20,7 +20,8 @@ The full model is the accuracy reference; AB is the strongest of the evaluated r
 - **Within-run client SD:** sample SD of the three client AP values, then mean and sample SD of that statistic across runs. A lower value is not, by itself, evidence of better worst-client AP.
 - **Worst-client AP:** minimum of the three client AP values within each run, then mean and sample SD over runs.
 - **Common-test AP:** each model is independently evaluated against the *same entire official test set*. For a personalized method, the three resulting AP values are averaged; this is **not** an ensemble or a single pooled prediction set.
-- **Per-class AP:** class-specific AP on the official common test set. These are not the same as a client's AP on its own partition; see the result JSONs for per-client/class values.
+- **Common-test per-class AP:** class-specific AP on the full official common test set.
+- **Client-local per-class AP:** class-specific AP of one aligned client model on that client's complete local test partition. The calculation includes every image in that partition, not only images positive for the class, so false positives on negative/background images affect AP. Class `support` records the number of ground-truth boxes; it is not the number of images used to calculate AP.
 
 Checkpoint selection used validation AP (macro client-local validation AP for FL) before the test evaluation. Neither test AP nor MIA results selected the reported checkpoint.
 

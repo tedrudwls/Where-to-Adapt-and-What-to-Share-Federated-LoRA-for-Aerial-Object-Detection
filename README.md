@@ -2,7 +2,7 @@
 
 Research code and reproducibility materials for an RT-DETR-L study of **where to place LoRA adapters** and **which adapter factors to share** in three-client federated aerial-object detection. The predefined reference configuration is **FedLoRA-AB, Backbone+Decoder, rank 8**.
 
-> **Release-candidate status.** This tree is being prepared for public release. The 96 validation-selected checkpoint binaries and the pretrained RT-DETR-L weight are **not present in this source tree**. The [checkpoint index](artifacts/checkpoint_index.json) contains recorded hashes and sizes, not downloadable models. A public artifact release, its license, and the paper citation will be linked only after verification. See the [release checklist](docs/RELEASE_CHECKLIST.md).
+> **Release-candidate status.** This tree is being prepared for public release. The 96 validation-selected checkpoint binaries and the pretrained RT-DETR-L weight are **not present in this source tree**. The [checkpoint index](artifacts/checkpoint_index.json) contains recorded hashes and sizes, not downloadable models. A public artifact release and the preferred paper citation will be linked only after verification. See the [release checklist](docs/RELEASE_CHECKLIST.md).
 
 ## At a glance
 
@@ -37,7 +37,7 @@ Across IID and severe Dirichlet α=0.1 partitions, seed-aligned common-test AP f
 
 Under the seed-43 Dirichlet α=0.4 partition, client 1 had no helicopter-positive image or box in its local training set, while the other two clients jointly had 5,528 helicopter training boxes. Client 1's validation partition contained 142 helicopter positives and was used for checkpoint selection. This is therefore a **zero local training support** case, not zero-shot or open-vocabulary detection.
 
-On all 75 helicopter-positive images in client 1's official-test partition, helicopter AP was **62.91** for FedLoRA-AB, **0.09** for FedLoRA-A (Share-A / local B), and **8.03** for FedLoRA-B (Share-B / local A), on the README's 0–100 scale. The two examples below were fixed from ground truth before predictions were inspected: among eligible test images whose audited source group was absent from both training and validation, they are the p10 and p50 ranks by normalized ground-truth box area. All panels use the corresponding rank-8 validation-selected checkpoint and a fixed **0.25 display threshold**.
+On client 1's full 748-image local test partition, which contained 75 helicopter boxes in 75 positive images, client-local helicopter AP was **62.91** for FedLoRA-AB, **0.09** for FedLoRA-A (Share-A / local B), and **8.03** for FedLoRA-B (Share-B / local A), on the README's 0–100 scale. These AP values were computed over the full 748-image partition, so negative/background images and false positives contribute to the metric; they are not AP values restricted to the 75 positive images. A ground-truth-only rule froze three source-disjoint candidates at the p10, p50, and p90 ranks of normalized helicopter-box area before inference. For a compact display, the README shows the p10 and p50 cases. This two-image display subset is illustrative and is not used to compute or rank the quantitative results. All panels use the corresponding rank-8 validation-selected checkpoint and a fixed **0.25 display threshold**.
 
 **Small target (p10; official-test image 62).**
 
@@ -47,7 +47,7 @@ On all 75 helicopter-positive images in client 1's official-test partition, heli
 
 ![Median-size helicopter comparison for seed 43, client 1](assets/unseen_helicopter_s43_c1_median_image1114.png)
 
-FedLoRA-AB labels the target as *helicopter* in both examples, whereas both selective-sharing endpoints label it as *drone*. In the small-target example, FedLoRA-AB and FedLoRA-A also emit off-target *drone* false positives at 0.287 and 0.425; these outputs are intentionally retained rather than hidden. The images illustrate the aggregate AP result but do not by themselves establish causal superiority. Federated updates can carry helicopter-relevant information from the other clients, and helicopter-positive validation data informed checkpoint selection. Source images: [AOD-4, Soni et al., Mendeley Data V1](https://doi.org/10.17632/cd5z895tr2.1), licensed [CC BY 4.0](https://data.mendeley.com/datasets/cd5z895tr2/1); model boxes, labels, and the small-target inset were added for this study.
+FedLoRA-AB labels the target as *helicopter* in both examples, whereas both selective-sharing endpoints label it as *drone*. In the small-target example, FedLoRA-AB and FedLoRA-A also emit off-target *drone* false positives at 0.287 and 0.425; these outputs are intentionally retained rather than hidden. The examples are consistent with the client-local per-class AP result for this single seed/client case, but they do not by themselves establish causal superiority. Federated updates can carry helicopter-relevant information from the other clients, and helicopter-positive validation data informed checkpoint selection. Source images: [AOD-4, Soni et al., Mendeley Data V1](https://doi.org/10.17632/cd5z895tr2.1), licensed [CC BY 4.0](https://data.mendeley.com/datasets/cd5z895tr2/1); model boxes, labels, and the small-target inset were added for this study.
 
 ## Reproduce the study
 
@@ -65,7 +65,6 @@ scripts/run_rank_sensitivity.sh     historical FedLoRA-A rank wrapper
 scripts/run_heterogeneity_cell.sh   IID and Dirichlet α=0.1 cells
 scripts/mia_*audit.py               read-only endpoint-MIA sensitivity analyses
 scripts/verify_checkpoint_assets.py read-only 96-checkpoint SHA-256 check
-scripts/render_test_qualitative.py two-stage held-out test figure (select, then render)
 ```
 
 The reported runs used Python 3.9.18, PyTorch 2.5.1+cu124, torchvision 0.20.1, and Ultralytics 8.4.126 on RTX A6000 GPUs. A fresh installation in a different environment should run the tests and preflight before any long training. The study used 640-pixel inputs, batch size eight, AdamW, five-effective-epoch warmup followed by cosine decay, no AMP, and no early stopping. **Do not use test AP to select a checkpoint.**
@@ -77,7 +76,7 @@ The reported runs used Python 3.9.18, PyTorch 2.5.1+cu124, torchvision 0.20.1, a
 - The [selected-checkpoint index](artifacts/checkpoint_index.json) covers 96 validation-selected models (4,554,894,872 bytes in total). A user-reported read-only server check verified all 96 against their recorded sizes and SHA-256 values; **public downloads are still pending**. See [Checkpoints](docs/CHECKPOINTS.md).
 - The 96 complete result JSONs, their derived tables, and the frozen MIA audit are separate research artifacts. The received JSON archive's [SHA-256](artifacts/result_bundle_sha256.txt) is recorded, but its publication location and immutable release identifier will be added only after upload and verification.
 - The [server-source comparison](provenance/SERVER_SOURCE_COMPARISON.md) distinguishes byte-identical experiment code from five documented release-only portability/comment edits; recovery/evidence utilities are a separate pending review.
-- The [held-out test qualitative protocol](docs/QUALITATIVE_TEST.md) preselects source-disjoint test examples from ground truth before rendering with validation-selected checkpoints. Its figure is an illustration, not an additional AP result.
+- The [held-out qualitative protocol](docs/QUALITATIVE_TEST.md) documents the seed-43/client-1 zero-local-training-support case, the ground-truth-only p10/p50/p90 selection rule, and the reporting boundaries. The README displays the p10 and p50 static figures; the frozen, path-sanitized selection and prediction record is available as [qualitative metadata](artifacts/qualitative_unseen_helicopter_s43_c1.json). No additional case-specific visualization code is required to interpret the committed figures.
 
 ## Interpretation boundaries
 
@@ -97,4 +96,10 @@ The official export has 281 key/hash-connected source components spanning at lea
 
 ## Citation and license
 
-The manuscript is under preparation for submission. Author-approved citation metadata and a persistent identifier will be added when available; please cite the repository URL and exact commit in the meantime. **No project reuse license has been selected yet.** The code depends on Ultralytics; the authors must confirm the applicable software and pretrained-derived weight redistribution terms before publishing the complete code and checkpoints. Do not treat this source tree or its checksum manifest as a grant of rights to redistribute AOD-4 images or pretrained weights.
+**Authors:** Gyeongjin Kim<sup>†</sup>, Yeongjin Jeon<sup>†</sup>, Jae Kwan Park, Yuhyun Chae, and Hyukjin Kwon<sup>*</sup>
+
+<sup>†</sup>Equal contribution. <sup>*</sup>Corresponding author.
+
+The manuscript is under preparation for submission. Use [`CITATION.cff`](CITATION.cff) to cite the software and include the exact commit; a preferred paper citation and persistent identifier will be added when available.
+
+Project-authored code and documentation, and the validation-selected checkpoints released by the authors, are licensed under the **GNU Affero General Public License v3.0 only (`AGPL-3.0-only`)**. Third-party software, the Ultralytics pretrained model, AOD-4 data, and source imagery retain their respective terms. See [`LICENSE`](LICENSE) and [`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md). The raw AOD-4 images are not redistributed here.

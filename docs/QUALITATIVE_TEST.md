@@ -1,57 +1,57 @@
-# Held-out test qualitative comparison
+# Held-out qualitative illustrations: seed-43 zero-local-support case
 
-This is a **two-stage, read-only analysis of historical primary inputs**, not a new training run or an AP re-evaluation. Run `select` before loading any model. It fixes two official AOD-4 v6 test images using only ground-truth annotations and the audited source-group identity. `render` then applies five validation-selected FL checkpoints to those exact images. Neither stage changes the primary result JSONs, checkpoints, split manifests, or dataset. Both refuse an existing output directory.
+The two figures in the README are static, read-only illustrations from historical validation-selected checkpoints. They are not a new training run, an AP re-evaluation, or evidence selected from model outcomes. The path-sanitized selection, checkpoint, prediction, and figure records are preserved in [`artifacts/qualitative_unseen_helicopter_s43_c1.json`](../artifacts/qualitative_unseen_helicopter_s43_c1.json). No additional case-specific rendering utility is distributed for these committed figures.
 
-## Selection and comparison protocol
+## Case and quantitative context
 
-- Partition: Dirichlet alpha 0.4, training/partition seed 42, three clients.
-- Eligible image: official test image whose Roboflow-filename/SHA-256 connected source component does **not** occur in train or validation. This makes the *two illustrated examples* source-disjoint; it does not alter the official-test AP tables or make the entire official split source-disjoint.
-- Two predetermined strata: an image with a drone annotation and an image with a helicopter annotation. Within each class, the selected image has a largest target box whose normalized area is closest to the class median on a log-area scale; image ID breaks ties. The two image IDs must differ. This ground-truth-only rule avoids selecting cases based on model successes or failures. Predictions are not available at this stage.
-- Row 1 (placement): GT, FedLoRA-AB Decoder-only, FedLoRA-AB Backbone-only, FedLoRA-AB Backbone+Decoder.
-- Row 2 (sharing): GT, FedLoRA-AB, FedLoRA-A (shared A/local B), FedLoRA-B (shared B/local A). Each row compares its methods on **one identical image**; the two rows use different test images.
-- All five methods use rank 8, the same split, selected-best checkpoint, 640-pixel input and display confidence threshold 0.25. The threshold is **for rendering**, not the COCO AP computation. Personalized endpoints restore the factor belonging to the selected image's client.
+- Partition: Dirichlet alpha 0.4, paired training/partition seed 43, three clients.
+- Focal endpoint: client 1, rank-8 Backbone+Decoder LoRA.
+- Client 1 local training support for helicopter: 0 boxes in 0 images.
+- Client 1 validation support: 142 boxes in 142 positive images. Validation performance selected the checkpoint, so this is not a zero-shot or open-vocabulary setting.
+- Client 1 local test partition: 748 total images, including 75 helicopter boxes in 75 positive images.
+- Other-client training support: 5,528 helicopter boxes.
 
-## Server commands
+Helicopter AP below is client-local per-class AP on the **complete 748-image local test partition**, not AP restricted to the 75 positive images. Negative/background images and false positives therefore contribute to the metric.
 
-From a checkout of this release-draft branch with the historical project and dataset still at their verified paths:
+| Sharing policy | Client-local helicopter AP (0–100) |
+| --- | ---: |
+| FedLoRA-AB | 62.91 |
+| FedLoRA-A (Share-A / local B) | 0.09 |
+| FedLoRA-B (Share-B / local A) | 8.03 |
 
-```bash
-cd /home/gpuadmin/kim/fedsalora
-source .venv/bin/activate
+## Outcome-blind image selection
 
-CODE_DIR=/path/to/Where-to-Adapt-and-What-to-Share-Federated-LoRA-for-Aerial-Object-Detection
-PROJECT=/home/gpuadmin/kim/fedsalora
-DATA_ROOT=/home/gpuadmin/kim/project2/data/aod4/AOD4/Images
-SPLIT_FILE="$PROJECT/data/splits/split_official_v6_dirichlet_a0.4_c3_s42.json"
-TAG=$(date -u +%Y%m%dT%H%M%SZ)
-SELECTION_DIR="$PROJECT/review_evidence/qualitative_selection_$TAG"
-RENDER_DIR="$PROJECT/review_evidence/qualitative_render_$TAG"
+The selection was frozen before inference using only the official test annotations and the audited source-group identity:
 
-python3 "$CODE_DIR/scripts/render_test_qualitative.py" select \
-  --data-root "$DATA_ROOT" \
-  --split-file "$SPLIT_FILE" \
-  --output-dir "$SELECTION_DIR"
+1. Select client 1 test images containing a helicopter box.
+2. Require the image's Roboflow-filename/SHA-256 connected source group to be absent from both training and validation.
+3. Sort the resulting 75 candidates by normalized helicopter ground-truth box area, using image ID to make rank ties deterministic.
+4. Freeze the p10, p50, and p90 cases. The README displays p10 and p50 for a compact, legible presentation; omitting p90 from the display does not affect any quantitative result.
 
-# Inspect and freeze selection.json before any inference.
-python3 -m json.tool "$SELECTION_DIR/selection.json" | less
-sha256sum "$SELECTION_DIR/selection.json"
+| Stratum | Official-test image | Area rank | Normalized GT area | README display |
+| --- | ---: | ---: | ---: | --- |
+| p10 / small | 62 | 8 / 75 | 0.0026178360 | Yes |
+| p50 / median | 1114 | 38 / 75 | 0.0351476669 | Yes |
+| p90 / large | 1177 | 68 / 75 | 0.4103660583 | No |
 
-CUDA_VISIBLE_DEVICES=2 python3 "$CODE_DIR/scripts/render_test_qualitative.py" render \
-  --selection "$SELECTION_DIR/selection.json" \
-  --split-file "$SPLIT_FILE" \
-  --data-root "$DATA_ROOT" \
-  --project-dir "$PROJECT" \
-  --results-root "$PROJECT/results/official_v6" \
-  --checkpoint-index "$CODE_DIR/artifacts/checkpoint_index.json" \
-  --model-weights "$PROJECT/rtdetr-l.pt" \
-  --device cuda:0 \
-  --output-dir "$RENDER_DIR"
-```
+The source-disjoint statement applies to these selected examples only. It does not make the full official test split source-disjoint and does not alter the official AP tables.
 
-`CUDA_VISIBLE_DEVICES=2` makes physical GPU 2 appear as `cuda:0` to this process. Do not reuse an existing output directory; a rerun must get a new tag. The artifacts record the selected image IDs and source groups, ground truth, selected checkpoint hashes/rounds, rendering parameters, and displayed prediction boxes. Preserve the executed command or terminal log separately. The `best_federated.pt` paths must exist and match the 96-checkpoint SHA-256 index; there is no fallback to `last_federated.pt`.
+## Inference record
 
-Do not use `main.py --resume` or `evaluate_federated_checkpoint()` for this figure: those paths can rewrite primary result files. PyTorch checkpoints are pickle-based; load only the trusted, hash-verified historical files.
+All methods use the corresponding rank-8 validation-selected personalized endpoint, 640-pixel inference, and a fixed display confidence threshold of 0.25. The threshold controls only which boxes appear in the figures; COCO AP is computed independently of this display threshold. Selected rounds differ because validation selected each endpoint separately.
 
-## Reporting boundary
+| Method | Experiment | Selected round | Selected-checkpoint SHA-256 |
+| --- | --- | ---: | --- |
+| FedLoRA-AB | `seed_43/fl_lora_r8_a0.4` | 20 | `ad928c84c5f1a82f7f88334ce5825422d1249bd59cb934eaeb3ddac3a751ff02` |
+| FedLoRA-A | `seed_43/fl_fedsa_lora_r8_a0.4` | 20 | `c0ebf42091e3381c933a824c0b53f993af72c016c2e5015105ef90889448c616` |
+| FedLoRA-B | `seed_43/fl_fixed_share_b_lora_r8_a0.4` | 6 | `f454435dc0a37530c919ccfff921ddfbe84fb18bc1919477cad186fdf513116d` |
 
-The composite is an **illustration** of detector behavior, not a substitute for the three-seed AP and communication tables. Do not replace an image after seeing the predictions merely because another looks better. If the selected case is visually ambiguous, report that limitation or specify a new, outcome-blind selection protocol as a separately labeled exploratory figure. Publish the selection and prediction metadata alongside the figure. The final paper caption must disclose that these are two seed-42, source-disjoint *examples* from the official test set, plus the fixed display threshold and best-checkpoint rule.
+For image 62, FedLoRA-AB labels the target as helicopter at 0.578 and also produces an off-target drone false positive at 0.287. FedLoRA-A labels the target as drone at 0.608 and retains another drone false positive at 0.425; FedLoRA-B labels the target as drone at 0.686. For image 1114, FedLoRA-AB labels the target as helicopter at 0.875, while FedLoRA-A and FedLoRA-B label it as drone at 0.821 and 0.669. The committed figures retain these displayed outputs rather than suppressing unfavorable predictions.
+
+## Interpretation boundary
+
+- This is one naturally occurring seed/client/class case, not a repeated leave-one-class-out experiment. It has no run SD, confidence interval, or significance claim.
+- The figures illustrate model behavior and are consistent with the full-partition class AP; two images cannot establish aggregate or causal superiority.
+- All three LoRA policies share classification/denoising head state, begin from a pretrained representation, and use helicopter-positive validation data for checkpoint selection. The result cannot isolate a causal semantic role for A or B alone.
+- Federated updates can carry helicopter-relevant information from the other clients, but raw images and boxes are not transmitted by the evaluated FL protocol.
+- The public JSON removes historical server paths while retaining split, image, source-group, checkpoint, result, prediction, and figure hashes needed to audit the committed record.
