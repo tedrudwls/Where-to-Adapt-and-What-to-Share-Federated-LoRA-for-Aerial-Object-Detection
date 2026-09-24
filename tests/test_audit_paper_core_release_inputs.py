@@ -261,7 +261,18 @@ class CoreAuditTests(unittest.TestCase):
                     .FROZEN_PUBLIC_TENSOR_FINGERPRINT_SHA256
                 ),
             },
-            "path_replacements": [],
+            "path_replacements": [
+                {
+                    "json_pointer": "/architecture/model_weight_path",
+                    "historical_value_sha256": "c" * 64,
+                    "public_value": "external/rtdetr-l.pt",
+                },
+                {
+                    "json_pointer": "/experiment/model_weights",
+                    "historical_value_sha256": "d" * 64,
+                    "public_value": "external/rtdetr-l.pt",
+                },
+            ],
             "residual_absolute_path_count": 0,
         }
         with mock.patch.object(target, "_load_torch", return_value=FakeTorch), mock.patch.object(
@@ -290,6 +301,26 @@ class CoreAuditTests(unittest.TestCase):
         for record in records:
             path = project / record["historical_project_relative_path"]
             self.assertEqual(_sha256(path), record["sha256"])
+
+    def test_path_free_gate_allows_only_the_two_reviewed_json_pointers(self):
+        target._assert_path_free_report({
+            "path_replacements": [
+                {"json_pointer": "/architecture/model_weight_path"},
+                {"json_pointer": "/experiment/model_weights"},
+            ]
+        })
+        with self.assertRaisesRegex(
+            target.CoreAuditError, "absolute local filesystem path"
+        ):
+            target._assert_path_free_report({
+                "path_replacements": [
+                    {"json_pointer": "/unexpected/absolute-looking/value"}
+                ]
+            })
+        with self.assertRaisesRegex(
+            target.CoreAuditError, "absolute local filesystem path"
+        ):
+            target._assert_path_free_report({"value": "/home/user/private.pt"})
 
     def test_existing_representative_public_identity_is_a_cross_check(self):
         record = {

@@ -654,23 +654,44 @@ def _assert_existing_representative_identity(
         )
 
 
-def _walk_strings(value: Any) -> Iterable[str]:
+def _walk_report_strings(
+    value: Any, path: tuple[Any, ...] = ()
+) -> Iterable[tuple[tuple[Any, ...], str]]:
     if isinstance(value, dict):
         for key, item in value.items():
             if isinstance(key, str):
-                yield key
-            yield from _walk_strings(item)
+                yield path + (f"<dict-key:{key}>",), key
+            yield from _walk_report_strings(item, path + (key,))
     elif isinstance(value, (list, tuple)):
-        for item in value:
-            yield from _walk_strings(item)
+        for index, item in enumerate(value):
+            yield from _walk_report_strings(item, path + (index,))
     elif isinstance(value, str):
-        yield value
+        yield path, value
 
 
 def _assert_path_free_report(report: Mapping[str, Any]) -> None:
-    leaked = [value for value in _walk_strings(report) if release_builder._path_string(value)]
+    reviewed_json_pointers = {
+        "/architecture/model_weight_path",
+        "/experiment/model_weights",
+    }
+    leaked = []
+    for path, value in _walk_report_strings(report):
+        if (
+            path
+            and path[-1] == "json_pointer"
+            and value in reviewed_json_pointers
+        ):
+            continue
+        if release_builder._path_string(value):
+            leaked.append({
+                "report_pointer": "/" + "/".join(map(str, path)),
+                "value_sha256": hashlib.sha256(value.encode("utf-8")).hexdigest(),
+            })
     if leaked:
-        raise CoreAuditError("Audit report contains an absolute local filesystem path")
+        raise CoreAuditError(
+            "Audit report contains an absolute local filesystem path: "
+            + json.dumps(leaked, sort_keys=True)
+        )
 
 
 def _write_exclusive(path: Path, raw: bytes) -> None:
