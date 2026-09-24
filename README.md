@@ -68,6 +68,8 @@ scripts/verify_checkpoint_assets.py read-only 96-checkpoint SHA-256 check
 scripts/evaluate_checkpoint.py      P0 read-only representative-checkpoint AP replay
 scripts/build_representative_release_bundle.py  path-sanitized minimal release builder
 scripts/verify_representative_release_bundle.py safe outer/inner release verification
+scripts/build_paper_core_release_bundle.py      streaming 12-checkpoint release builder
+scripts/verify_paper_core_release_bundle.py     pinned streaming archive verifier
 ```
 
 The evaluator's exact artifact hashes, safety boundary and artifact-host
@@ -88,6 +90,7 @@ The reported runs used Python 3.9.18, PyTorch 2.5.1+cu124, torchvision 0.20.1, a
 - A compact summary and SHA-256 inventory of nine historical schema-v7 split manifests are preserved under [`provenance/splits/`](provenance/splits/) for audit. The complete manifests are a pending separate artifact; they contain original-server paths and must **not** be edited in place. Regenerate local splits for a different data root.
 - The [selected-checkpoint index](artifacts/checkpoint_index.json) covers 96 validation-selected models (4,554,894,872 bytes in total). A user-reported read-only server check verified all 96 against their recorded sizes and SHA-256 values; **public downloads are still pending**. See [Checkpoints](docs/CHECKPOINTS.md).
 - The first publication gate is a [minimal representative replay bundle](docs/REPRESENTATIVE_RELEASE.md): one path-sanitized personalized checkpoint plus a committed path-free test manifest. The sanitized checkpoint has passed the author-run pre-release GPU acceptance recorded in the [machine-readable receipt](artifacts/representative_public_gpu_acceptance.json). AOD-4 images and `rtdetr-l.pt` remain external, and the bundle is not called public until a GitHub Release asset has passed clean re-download and GPU replay.
+- The next [paper-core checkpoint gate](docs/PAPER_CORE_RELEASE.md) covers the primary four-method comparison at seeds 42/43/44. A read-only host audit pinned all 12 sanitized checkpoint identities and preserved all protected inputs, but the combined archive is still prepublication until its clean build, bundled-checkpoint GPU replay and public re-download gates pass.
 - The 96 complete result JSONs, their derived tables, and the frozen MIA audit are separate research artifacts. The received JSON archive's [SHA-256](artifacts/result_bundle_sha256.txt) is recorded, but its publication location and immutable release identifier will be added only after upload and verification.
 - The [server-source comparison](provenance/SERVER_SOURCE_COMPARISON.md) distinguishes byte-identical experiment code from five documented release-only portability/comment edits; recovery/evidence utilities are a separate pending review.
 - The [held-out qualitative protocol](docs/QUALITATIVE_TEST.md) documents the seed-43/client-1 zero-local-training-support case, the ground-truth-only p10/p50/p90 selection rule, and the reporting boundaries. The README displays the p10 and p50 static figures; the frozen, path-sanitized selection and prediction record is available as [qualitative metadata](artifacts/qualitative_unseen_helicopter_s43_c1.json). No additional case-specific visualization code is required to interpret the committed figures.
