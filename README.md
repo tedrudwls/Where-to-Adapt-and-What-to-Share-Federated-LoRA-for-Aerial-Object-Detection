@@ -2,7 +2,7 @@
 
 Research code and reproducibility materials for an RT-DETR-L study of **where to place LoRA adapters** and **which adapter factors to share** in three-client federated aerial-object detection. The predefined reference configuration is **FedLoRA-AB, Backbone+Decoder, rank 8**.
 
-> **Release-candidate status.** This tree is being prepared for public release. The 96 validation-selected checkpoint binaries and the pretrained RT-DETR-L weight are **not present in this source tree**. The [checkpoint index](artifacts/checkpoint_index.json) contains recorded hashes and sizes, not downloadable models. A public artifact release and the preferred paper citation will be linked only after verification. See the [release checklist](docs/RELEASE_CHECKLIST.md).
+> **Artifact status.** The 12-checkpoint paper-core archive is publicly available from the [paper-core-checkpoints-v1.0.0 Release](https://github.com/tedrudwls/Where-to-Adapt-and-What-to-Share-Federated-LoRA-for-Aerial-Object-Detection/releases/tag/paper-core-checkpoints-v1.0.0). Its unauthenticated re-download, checksum, structural verification, and representative GPU replay passed; see the [public release acceptance receipt](artifacts/public_release_acceptance_receipt.json). Checkpoints remain outside ordinary Git history, and the remaining 84 indexed checkpoints, complete result bundle, AOD-4 data, and `rtdetr-l.pt` are not part of this Release.
 
 ## At a glance
 
@@ -74,13 +74,16 @@ scripts/verify_paper_core_release_bundle.py     pinned streaming archive verifie
 
 The evaluator's exact artifact hashes, safety boundary and artifact-host
 acceptance commands are documented in [Read-only evaluation](docs/READ_ONLY_EVALUATION.md).
-On 2026-09-23, the representative sanitized public checkpoint passed an
-author-run, read-only GPU replay on one recorded RTX A6000 environment. It
+On 2026-09-23, the representative sanitized checkpoint passed an author-run,
+read-only pre-release GPU replay on one recorded RTX A6000 environment. It
 verified all 2,241 test images and reproduced the frozen client-local and
 common-test metrics with maximum absolute error `0.0`; the path-free
 [pre-release acceptance receipt](artifacts/representative_public_gpu_acceptance.json)
-records the exact identities and scope. This is evaluation replay, not training
-reproduction or independent public-download verification.
+records the exact identities and scope. On 2026-09-24, the same checkpoint was
+anonymously re-downloaded inside the published paper-core archive and repeated
+the GPU replay with maximum absolute error `0.0`; see the
+[public release acceptance receipt](artifacts/public_release_acceptance_receipt.json).
+This is evaluation replay, not training reproduction.
 
 The reported runs used Python 3.9.18, PyTorch 2.5.1+cu124, torchvision 0.20.1, and Ultralytics 8.4.126 on RTX A6000 GPUs. A fresh installation in a different environment should run the tests and preflight before any long training. The study used 640-pixel inputs, batch size eight, AdamW, five-effective-epoch warmup followed by cosine decay, no AMP, and no early stopping. **Do not use test AP to select a checkpoint.**
 
@@ -88,9 +91,8 @@ The reported runs used Python 3.9.18, PyTorch 2.5.1+cu124, torchvision 0.20.1, a
 
 - Download the public [AOD-4 dataset (Mendeley Data, Version 1)](https://doi.org/10.17632/cd5z895tr2.1) and use the historical AOD-4 v6 COCO export membership: 15,761 train, 4,514 validation, and 2,241 test images. The raw images are **not redistributed here**. See [Dataset and splits](docs/DATASET.md).
 - A compact summary and SHA-256 inventory of nine historical schema-v7 split manifests are preserved under [`provenance/splits/`](provenance/splits/) for audit. The complete manifests are a pending separate artifact; they contain original-server paths and must **not** be edited in place. Regenerate local splits for a different data root.
-- The [selected-checkpoint index](artifacts/checkpoint_index.json) covers 96 validation-selected models (4,554,894,872 bytes in total). A user-reported read-only server check verified all 96 against their recorded sizes and SHA-256 values; **public downloads are still pending**. See [Checkpoints](docs/CHECKPOINTS.md).
-- The first publication gate is a [minimal representative replay bundle](docs/REPRESENTATIVE_RELEASE.md): one path-sanitized personalized checkpoint plus a committed path-free test manifest. The sanitized checkpoint has passed the author-run pre-release GPU acceptance recorded in the [machine-readable receipt](artifacts/representative_public_gpu_acceptance.json). AOD-4 images and `rtdetr-l.pt` remain external, and the bundle is not called public until a GitHub Release asset has passed clean re-download and GPU replay.
-- The next [paper-core checkpoint gate](docs/PAPER_CORE_RELEASE.md) covers the primary four-method comparison at seeds 42/43/44. A read-only host audit pinned all 12 sanitized checkpoint identities and preserved all protected inputs, but the combined archive is still prepublication until its clean build, bundled-checkpoint GPU replay and public re-download gates pass.
+- The [selected-checkpoint index](artifacts/checkpoint_index.json) covers 96 validation-selected models (4,554,894,872 bytes in total). A user-reported read-only server check verified all 96 against their recorded sizes and SHA-256 values. Twelve primary checkpoints are now available in the verified [paper-core Release](https://github.com/tedrudwls/Where-to-Adapt-and-What-to-Share-Federated-LoRA-for-Aerial-Object-Detection/releases/tag/paper-core-checkpoints-v1.0.0); the remaining 84 and a complete 96-checkpoint release remain pending. See [Checkpoints](docs/CHECKPOINTS.md).
+- The [paper-core checkpoint release](docs/PAPER_CORE_RELEASE.md) contains Full FT, FedLoRA-AB, FedLoRA-A, and FedLoRA-B for seeds 42/43/44. Its 391,100,405-byte archive has SHA-256 `a6a09f7e89d72d09a426cd4dddf831d8dba937be43dde0ada3db9f6ba86aa116`; an unauthenticated clean download passed 12/12 structural verification, and the included seed-42 FedLoRA-A checkpoint passed the 2,241-image GPU replay with maximum absolute error `0.0`. The standalone representative archive described in the [preparatory procedure](docs/REPRESENTATIVE_RELEASE.md) was not separately published.
 - The 96 complete result JSONs, their derived tables, and the frozen MIA audit are separate research artifacts. The received JSON archive's [SHA-256](artifacts/result_bundle_sha256.txt) is recorded, but its publication location and immutable release identifier will be added only after upload and verification.
 - The [server-source comparison](provenance/SERVER_SOURCE_COMPARISON.md) distinguishes byte-identical experiment code from five documented release-only portability/comment edits; recovery/evidence utilities are a separate pending review.
 - The [held-out qualitative protocol](docs/QUALITATIVE_TEST.md) documents the seed-43/client-1 zero-local-training-support case, the ground-truth-only p10/p50/p90 selection rule, and the reporting boundaries. The README displays the p10 and p50 static figures; the frozen, path-sanitized selection and prediction record is available as [qualitative metadata](artifacts/qualitative_unseen_helicopter_s43_c1.json). No additional case-specific visualization code is required to interpret the committed figures.
@@ -110,6 +112,7 @@ The official export has 281 key/hash-connected source components spanning at lea
 | `provenance/splits/` | Compact historical split summary and full-manifest SHA-256 inventory |
 | `artifacts/checkpoint_index.json` | Expected checkpoint SHA-256, size and experiment ID; no binaries |
 | `artifacts/*replay_manifest.json` | Path-free, hash-pinned representative test replay metadata |
+| `artifacts/public_release_acceptance_receipt.json` | Path-free public-download, structural-verification and representative GPU-replay receipt |
 | `docs/` | Reproduction, data, results, checkpoint and audit documentation |
 
 ## Citation and license

@@ -132,7 +132,8 @@ environment: all 2,241 test images were verified, the final integrity gate
 passed, and the recomputed client-local/common-test metrics matched the archived
 reference within the frozen absolute tolerance (`1e-6`).
 This validates the vertical slice for the exact frozen artifacts and pinned
-environment; checkpoint download publication remains a separate release task.
+environment. The same sanitized checkpoint is now public inside the verified
+[paper-core Release](https://github.com/tedrudwls/Where-to-Adapt-and-What-to-Share-Federated-LoRA-for-Aerial-Object-Detection/releases/tag/paper-core-checkpoints-v1.0.0).
 
 The sanitized public-checkpoint form was then tested from evaluator source
 commit `461bb35b3d22f3d44da9c68e4cb9ead5ebad4761` on the same recorded RTX A6000
@@ -155,28 +156,30 @@ compared with the hash-pinned compact evaluation reference, while the report
 explicitly records `archived_result_verified: false`.
 
 The Phase-1 build fixed the sanitized checkpoint identity listed above. That
-checkpoint passed the author-run pre-release GPU replay recorded in the
-[acceptance receipt](../artifacts/representative_public_gpu_acceptance.json),
-but it has not been published as a GitHub Release asset or verified by clean
-public re-download. The command below is the frozen public replay procedure for
-the artifact host and for the required post-acceptance rebuild:
+checkpoint first passed the author-run pre-release GPU replay recorded in the
+[pre-release acceptance receipt](../artifacts/representative_public_gpu_acceptance.json).
+It was then included in the paper-core Release, anonymously re-downloaded, and
+replayed again with maximum absolute error `0.0`, as recorded in the
+[public release acceptance receipt](../artifacts/public_release_acceptance_receipt.json).
+The command below is the frozen replay procedure for an extracted public
+paper-core archive:
 
 ```bash
-: "${PROJECT_DIR:?Set PROJECT_DIR to a clean post-pin checkout}"
-: "${BUILD_ROOT:?Set BUILD_ROOT to the Phase-1 build directory}"
+: "${PROJECT_DIR:?Set PROJECT_DIR to a clean checkout of the release source commit}"
+: "${BUNDLE_ROOT:?Set BUNDLE_ROOT to the directory where the paper-core archive was extracted}"
 : "${DATA_ROOT:?Set DATA_ROOT to the verified AOD-4 Images directory}"
 : "${MODEL_WEIGHTS:?Set MODEL_WEIGHTS to the verified rtdetr-l.pt file}"
 PYTHON_BIN="${PYTHON_BIN:-python3}"
-REPORT="$BUILD_ROOT/output/public_gpu_replay.json"
+REPORT=$(mktemp)
 
 cd "$PROJECT_DIR"
 "$PYTHON_BIN" \
   scripts/evaluate_checkpoint.py \
   --checkpoint \
-    "$BUILD_ROOT/output/representative-replay/checkpoint/seed_42__fl_fedsa_lora_r8_a0.4__best_federated.pt" \
+    "$BUNDLE_ROOT/paper-core-checkpoints/checkpoints/seed_42__fl_fedsa_lora_r8_a0.4__best_federated.pt" \
   --model-weights "$MODEL_WEIGHTS" \
   --replay-manifest \
-    "$BUILD_ROOT/output/representative-replay/metadata/seed_42__fl_fedsa_lora_r8_a0.4__replay_manifest.json" \
+    "$PROJECT_DIR/artifacts/seed_42__fl_fedsa_lora_r8_a0.4__replay_manifest.json" \
   --data-root "$DATA_ROOT" \
   --device cuda:0 \
   > "$REPORT"
@@ -197,9 +200,12 @@ print("[PASS] Sanitized public checkpoint reproduced the frozen metrics")
 PY
 ```
 
-The initial public GPU gate has passed. Next, rebuild once from the clean commit
-that contains the acceptance receipt and this documentation. The public
-checkpoint SHA-256 and tensor fingerprint must remain identical; the archive
-SHA-256 will change because the embedded source commit changes. Structurally
-verify that rebuilt archive and replay its extracted checkpoint before upload.
-See the staged [representative release procedure](REPRESENTATIVE_RELEASE.md).
+The public gate completed on 2026-09-24. The published archive was downloaded
+without authentication into a new directory, its outer checksum and all 12
+checkpoint identities passed structural verification, and the extracted
+representative checkpoint reproduced the frozen metrics over all 2,241 test
+images with maximum absolute error `0.0`. This verifies evaluation replay for
+one included checkpoint; it does not claim AP replay for the other 11
+checkpoints or reproduce training. See the
+[paper-core release record](PAPER_CORE_RELEASE.md) and
+[final acceptance receipt](../artifacts/public_release_acceptance_receipt.json).

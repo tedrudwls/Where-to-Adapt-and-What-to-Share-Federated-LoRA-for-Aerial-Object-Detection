@@ -1,0 +1,59 @@
+{
+  "public_download": {
+    "archive": {
+      "asset_id": 585445902,
+      "bytes": 391100405,
+      "file_name": "fedlora-paper-core-checkpoints-v1.0.0.tar.gz",
+      "sha256": "a6a09f7e89d72d09a426cd4dddf831d8dba937be43dde0ada3db9f6ba86aa116"
+    },
+    "authenticated": false,
+    "checksum": {
+      "asset_id": 585445900,
+      "bytes": 111,
+      "file_name": "fedlora-paper-core-checkpoints-v1.0.0.tar.gz.sha256",
+      "sha256": "02dd8ff8e403bf9ae0aae1f47bba1c831aed52e5f018626a330160c0aaf4af77"
+    }
+  },
+  "release": {
+    "draft": false,
+    "id": 395457112,
+    "main_commit_at_publication": "4c89f765824e8f936675676204f2e1c345f7bf96",
+    "prerelease": false,
+    "public_url": "https://github.com/tedrudwls/Where-to-Adapt-and-What-to-Share-Federated-LoRA-for-Aerial-Object-Detection/releases/tag/paper-core-checkpoints-v1.0.0",
+    "published_at": "2026-09-24T08:46:08Z",
+    "source_commit": "6f295b2f94b4f61ff3be8beed0301c7a4ada862f",
+    "tag": "paper-core-checkpoints-v1.0.0",
+    "tag_commit": "6f295b2f94b4f61ff3be8beed0301c7a4ada862f"
+  },
+  "representative_gpu_replay": {
+    "client_macro": {
+      "AP": 0.6190019159385891,
+      "AP50": 0.902681661287866,
+      "AP75": 0.6780732838875302
+    },
+    "common_macro": {
+      "AP": 0.5620845765652397,
+      "AP50": 0.8576226357547724,
+      "AP75": 0.6074470685556409
+    },
+    "maximum_absolute_error": 0.0,
+    "report_sha256": "04fed4f547d14233b09d0f65709d0afdab520c1c28b5bb52887a948f77422c41",
+    "runtime": {
+      "gpu": "NVIDIA RTX A6000",
+      "python": "3.9.18",
+      "torch": "2.5.1+cu124",
+      "ultralytics": "8.4.126"
+    },
+    "scope": "seed_42_fedlora_a_only",
+    "test_images_verified": 2241
+  },
+  "schema_version": 1,
+  "scope": "unauthenticated_public_redownload_structural_verification_and_representative_gpu_replay",
+  "status": "pass",
+  "structural_verification": {
+    "checkpoint_count": 12,
+    "public_checkpoint_bytes": 423859412,
+    "report_sha256": "ac590848e42b90ce32b91dc091e90834f713a9b3233de4308e4b5d12981f64c1",
+    "status": "pass"
+  }
+}

@@ -1,9 +1,9 @@
 # Paper-core checkpoint release
 
 This release is the smallest checkpoint set that represents the paper's main
-federated comparison. It is separate from the existing seed-42 FedLoRA-A
-representative replay release, which remains an end-to-end artifact-pipeline
-smoke test.
+federated comparison. It also includes the seed-42 FedLoRA-A checkpoint used as
+the end-to-end artifact-pipeline and GPU-replay smoke test; no separate
+representative-only Release was published.
 
 ## Scope
 
@@ -23,15 +23,18 @@ identities are selected from
 [`artifacts/checkpoint_index.json`](../artifacts/checkpoint_index.json); their
 combined historical size is 423,860,180 bytes (404.225 MiB).
 
-The proposed public assets are:
+The published public assets are:
 
 ```text
 fedlora-paper-core-checkpoints-v1.0.0.tar.gz
 fedlora-paper-core-checkpoints-v1.0.0.tar.gz.sha256
 ```
 
-under the immutable release tag `paper-core-checkpoints-v1.0.0`. Checkpoint
-binaries are release assets and are not committed to ordinary Git history.
+under the pinned release tag `paper-core-checkpoints-v1.0.0`. They are
+available from the [public GitHub Release](https://github.com/tedrudwls/Where-to-Adapt-and-What-to-Share-Federated-LoRA-for-Aerial-Object-Detection/releases/tag/paper-core-checkpoints-v1.0.0). The archive is 391,100,405 bytes with SHA-256
+`a6a09f7e89d72d09a426cd4dddf831d8dba937be43dde0ada3db9f6ba86aa116`.
+Checkpoint binaries are release assets and are not committed to ordinary Git
+history.
 
 ## Two-phase publication gate
 
@@ -95,8 +98,9 @@ python3 scripts/verify_paper_core_release_bundle.py \
 
 The verifier checks the outer digest on the same open file descriptor before
 opening its gzip/tar stream and hashes tar members incrementally. It never
-deserializes checkpoint data. The separate GPU replay gate remains required
-before publication.
+deserializes checkpoint data. The separate GPU replay gate was completed before
+publication and repeated after an unauthenticated public re-download; see the
+[final acceptance receipt](../artifacts/public_release_acceptance_receipt.json).
 
 ## Intended archive boundary
 
@@ -125,10 +129,11 @@ ablation checkpoints.
   performance. They are not exact training-resumption snapshots.
 - The set supports the paper's primary method-by-seed comparison. Placement,
   rank, IID and alpha-0.1 ablations remain indexed separately.
-- The previously published seed-42 FedLoRA-A release is preserved unchanged;
-  it is not overwritten or relabeled as FedLoRA-AB.
+- The seed-42 FedLoRA-A checkpoint included in this paper-core Release is the
+  representative GPU-replay target; it is not relabeled as FedLoRA-AB. No
+  other checkpoint in the archive received an AP-replay claim.
 - Structural and tensor-identity verification does not by itself reproduce AP.
-  The existing seed-42 FedLoRA-A public replay is the current GPU acceptance
+  The recorded seed-42 FedLoRA-A replay is the archive's only GPU AP-acceptance
   test. Additional checkpoint replay claims must be made only after they are
   actually run and recorded.
 - AOD-4 and the upstream pretrained model remain external inputs governed by
@@ -136,15 +141,21 @@ ablation checkpoints.
 
 ## Release acceptance
 
-Before publication, the maintainers must complete all of the following:
+All paper-core publication gates completed on 2026-09-24:
 
-1. **Completed:** obtain a 12/12 passing read-only discovery report;
-2. **Completed:** commit the reviewed, path-free public identity specification;
-3. build from a clean immutable source commit using streaming archive I/O;
-4. verify the outer checksum and every exact archive member identity;
-5. extract into a fresh directory and run at least the already documented
-   seed-42 FedLoRA-A GPU replay from the bundled checkpoint;
-6. upload the two assets to a draft GitHub Release;
-7. download both assets through the public URL into a clean directory and
-   repeat the checksum, structural and GPU gates; and
-8. publish a path-free release receipt without editing the tagged commit.
+1. the 12/12 read-only discovery report and reviewed path-free identities were
+   committed;
+2. clean source commit `6f295b2f94b4f61ff3be8beed0301c7a4ada862f`
+   reproduced the 12 pinned identities and deterministic archive;
+3. the outer checksum and every archive member passed structural verification;
+4. the included seed-42 FedLoRA-A checkpoint passed the 2,241-image GPU replay;
+5. both assets were staged as a draft, verified, and then published under
+   `paper-core-checkpoints-v1.0.0`; and
+6. an unauthenticated clean re-download repeated the checksum, 12/12 structural
+   verification, and representative GPU replay with maximum absolute error
+   `0.0`.
+
+The path-free [public release acceptance receipt](../artifacts/public_release_acceptance_receipt.json)
+records the Release identity, asset IDs and hashes, verification-report hashes,
+runtime, metric values, and scope. Its SHA-256 is
+`6e035c0640540723c4934e255029d72992ab43ba16642b694f1bcaf102051e41`.

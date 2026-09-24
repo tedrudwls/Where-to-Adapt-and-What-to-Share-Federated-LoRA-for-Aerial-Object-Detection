@@ -7,6 +7,14 @@ FedLoRA-A is selected here because its checkpoint exercises both shared state
 and three client-personalized local-factor states; it is not the paper's main
 accuracy configuration.
 
+> **Status (2026-09-24):** no standalone representative archive was published.
+> Instead, this exact sanitized checkpoint is included in the verified
+> [paper-core-checkpoints-v1.0.0 Release](https://github.com/tedrudwls/Where-to-Adapt-and-What-to-Share-Federated-LoRA-for-Aerial-Object-Detection/releases/tag/paper-core-checkpoints-v1.0.0)
+> and passed an unauthenticated re-download, structural verification, and GPU
+> replay. See the [final acceptance receipt](../artifacts/public_release_acceptance_receipt.json).
+> The remainder of this document preserves the standalone preparatory procedure
+> for provenance; it is not a claim that those standalone assets exist.
+
 ## Public asset boundary
 
 The planned GitHub Release contains two files:
@@ -173,9 +181,10 @@ that new archive. The new archive digest is expected to differ from the
 Phase-1 digest because its embedded source commit changes. Do not upload, tag,
 or call the artifact public until the rebuilt candidate passes.
 
-## Phase 3: GitHub Release and clean re-download
+## Phase 3: standalone GitHub Release and clean re-download
 
-Create an immutable release tag only after Phase 2 passes. Upload the archive
+For the standalone bundle described here, create an immutable release tag only
+after Phase 2 passes. Upload the archive
 and its outer checksum as GitHub Release assets; do not commit the checkpoint to
 ordinary Git history. From a new empty directory:
 
