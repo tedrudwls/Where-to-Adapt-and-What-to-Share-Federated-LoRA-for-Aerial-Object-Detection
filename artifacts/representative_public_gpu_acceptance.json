@@ -1,0 +1,83 @@
+{
+  "schema_version": 1,
+  "receipt_type": "pre_release_public_checkpoint_gpu_acceptance",
+  "protocol": "representative_public_checkpoint_gpu_acceptance_v1",
+  "status": "pass",
+  "execution_date": "2026-09-23",
+  "evidence_scope": "author-reported artifact-host execution",
+  "evaluator": {
+    "source_commit": "461bb35b3d22f3d44da9c68e4cb9ead5ebad4761",
+    "mode": "public_replay",
+    "target_experiment": "seed_42/fl_fedsa_lora_r8_a0.4",
+    "unit_tests_passed": 35
+  },
+  "artifacts": {
+    "public_checkpoint": {
+      "file_name": "seed_42__fl_fedsa_lora_r8_a0.4__best_federated.pt",
+      "bytes": 3316452,
+      "sha256": "391205473ad8de24af56ba1b566e54a6f305dd0b79806cb468583e84e464fa14",
+      "tensor_fingerprint": {
+        "algorithm": "recursive_path_dtype_shape_raw_bytes_sha256_v1",
+        "tensor_count": 231,
+        "sha256": "b42e1e811238caf1ec76e788547dbcf46d8f390b3b0e63864cf3d303e88c6d4f"
+      }
+    },
+    "public_replay_manifest": {
+      "bytes": 472024,
+      "sha256": "ffe7b2932dfcfb0027a8e607abb3d8d5c8a5241d549b280524b77be5f3b44c88"
+    },
+    "evaluation_reference": {
+      "sha256": "4f6d33eeb255a96d0f49c51600dcf546a2ac5d96e782bd9826094f848e98dbef"
+    },
+    "pretrained_model": {
+      "file_name": "rtdetr-l.pt",
+      "sha256": "6de60b10d4bc566f00cda0f5b4d64afe4b66d48dc9695d2171effb7859d8e73f"
+    }
+  },
+  "dataset_gate": {
+    "historical_split_manifest_sha256": "74a45a37f4b05c474564993ff15f5548875f3e767abc19a0d2d30f195e1754c5",
+    "test_annotation_sha256": "761fa3c537c15017edccb5acdcd35ae78ca52746bf010630862de1798d572595",
+    "test_image_tree_sha256": "42776a3cfca2f66df7efc1215eb7f64e4d92f445d9e917e4d5f8d0909c50e411",
+    "test_images_verified": 2241
+  },
+  "runtime": {
+    "python": "3.9.18",
+    "torch": "2.5.1+cu124",
+    "ultralytics": "8.4.126",
+    "device": "NVIDIA RTX A6000"
+  },
+  "recomputed_metrics": {
+    "metric_scale": "0_to_1",
+    "client_local_macro": {
+      "AP": 0.6190019159385891,
+      "AP50": 0.902681661287866,
+      "AP75": 0.6780732838875302
+    },
+    "common_macro": {
+      "AP": 0.5620845765652397,
+      "AP50": 0.8576226357547724,
+      "AP75": 0.6074470685556409
+    },
+    "absolute_tolerance": 1e-06,
+    "maximum_absolute_error": 0.0
+  },
+  "integrity_gate": {
+    "status": "pass",
+    "checkpoint_variant": "public_sanitized",
+    "archived_result_used": false,
+    "protected_inputs_unchanged": true,
+    "test_image_metadata_unchanged": true
+  },
+  "release_boundary": {
+    "github_release_asset_published": false,
+    "clean_public_redownload_verified": false,
+    "post_pin_bundle_rebuild_required": true,
+    "note": "This receipt accepts the Phase-1 sanitized checkpoint on the artifact host. It is not a public-download or full 96-checkpoint release receipt."
+  },
+  "limitations": [
+    "pre_release_acceptance_not_public_download_verification",
+    "single_checkpoint_single_environment",
+    "evaluation_replay_not_training_reproduction",
+    "not_formal_security_or_privacy_certification"
+  ]
+}

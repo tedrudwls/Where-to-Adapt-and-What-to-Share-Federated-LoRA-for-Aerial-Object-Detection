@@ -124,7 +124,7 @@ class RepresentativeFixture:
         self.manifest_payload = {
             "metadata": {
                 **copy.deepcopy(target.FROZEN_MANIFEST_PROTOCOL),
-                "data_root": "/historical/server/AOD4/Images",
+                "data_root": "historical-data-root",
                 "annotation_sha256": {"test": _sha256(self.annotation)},
                 "split_counts": split_counts,
                 "source_split_counts": copy.deepcopy(split_counts),
@@ -151,9 +151,57 @@ class RepresentativeFixture:
         }
         self.split = root / "split.json"
         _write_json(self.split, self.manifest_payload)
+        self.replay_payload = {
+            "schema_version": 1,
+            "protocol": "fedlora_representative_test_replay",
+            "experiment_id": target.TARGET_EXPERIMENT_ID,
+            "historical_split_manifest": {
+                "schema_version": target.FROZEN_MANIFEST_PROTOCOL["schema_version"],
+                "sha256": _sha256(self.split),
+            },
+            "partition_protocol": copy.deepcopy(target.FROZEN_MANIFEST_PROTOCOL),
+            "split_counts": copy.deepcopy(split_counts),
+            "client_image_counts": {
+                split_name: [
+                    client["splits"][split_name]["num_images"]
+                    for client in clients
+                ]
+                for split_name in ("train", "val", "test")
+            },
+            "test": {
+                "annotation": {
+                    "relative_path": "test/_annotations.coco.json",
+                    "sha256": _sha256(self.annotation),
+                },
+                "category_audit": copy.deepcopy(
+                    self.manifest_payload["metadata"]["source_category_audit"]["test"]
+                ),
+                "source_inventory": {
+                    "schema_version": 1,
+                    "identity_policy": self.manifest_payload["metadata"]
+                    ["source_hash_inventory"]["identity_policy"],
+                    "historical_inventory_sha256": self.manifest_payload["metadata"]
+                    ["source_hash_inventory"]["inventory_sha256"],
+                    "image_tree_sha256": self.manifest_payload["metadata"]
+                    ["source_hash_inventory"]["per_split_image_tree_sha256"]["test"],
+                    "records": copy.deepcopy(inventory),
+                },
+                "client_image_ids": [
+                    {
+                        "client_id": client_id,
+                        "image_ids": copy.deepcopy(client["splits"]["test"]["image_ids"]),
+                    }
+                    for client_id, client in enumerate(clients)
+                ],
+            },
+        }
+        self.replay = root / "replay.json"
+        _write_json(self.replay, self.replay_payload)
 
         self.checkpoint = root / "best_federated.pt"
-        self.checkpoint.write_bytes(b"synthetic-checkpoint")
+        self.checkpoint.write_bytes(b"synthetic-historical-checkpoint")
+        self.public_checkpoint = root / "public_best_federated.pt"
+        self.public_checkpoint.write_bytes(b"synthetic-public-checkpoint")
         self.model_weights = root / "rtdetr-l.pt"
         self.model_weights.write_bytes(b"synthetic-pretrained-model")
 
@@ -252,7 +300,14 @@ class RepresentativeFixture:
             "display_name": "FedLoRA-A (Share-A / local B)",
             "metric_scale": "0_to_1",
             "absolute_tolerance": 1e-6,
-            "checkpoint": {
+            "public_replay_manifest": {
+                "file_name": (
+                    "seed_42__fl_fedsa_lora_r8_a0.4__replay_manifest.json"
+                ),
+                "bytes": self.replay.stat().st_size,
+                "sha256": _sha256(self.replay),
+            },
+            "historical_checkpoint": {
                 "release_asset_name": self.record["release_asset_name"],
                 "historical_project_relative_path": self.record[
                     "historical_project_relative_path"
@@ -262,6 +317,22 @@ class RepresentativeFixture:
                 "selected_round": 20,
                 "contract": copy.deepcopy(target.FROZEN_CHECKPOINT_CONTRACT),
                 "compatibility": copy.deepcopy(target.FROZEN_COMPATIBILITY),
+            },
+            "public_checkpoint": {
+                "file_name": self.record["release_asset_name"],
+                "bytes": self.public_checkpoint.stat().st_size,
+                "sha256": _sha256(self.public_checkpoint),
+                "historical_source": {
+                    "bytes": self.record["bytes"],
+                    "sha256": self.record["sha256"],
+                },
+                "tensor_fingerprint": {
+                    "algorithm": (
+                        "recursive_path_dtype_shape_raw_bytes_sha256_v1"
+                    ),
+                    "sha256": "d" * 64,
+                    "tensor_count": 3,
+                },
             },
             "pretrained_model": {
                 "file_name": "rtdetr-l.pt",
@@ -310,11 +381,26 @@ class RepresentativeFixture:
             "--device", "cpu",
         ]
 
+    def public_argv(self):
+        return [
+            "--checkpoint", str(self.public_checkpoint),
+            "--checkpoint-index", str(self.index),
+            "--reference", str(self.reference),
+            "--model-weights", str(self.model_weights),
+            "--replay-manifest", str(self.replay),
+            "--data-root", str(self.data_root),
+            "--device", "cpu",
+        ]
+
     def frozen_identity_patch(self):
         return mock.patch.multiple(
             target,
-            FROZEN_CHECKPOINT_BYTES=self.record["bytes"],
-            FROZEN_CHECKPOINT_SHA256=self.record["sha256"],
+            FROZEN_HISTORICAL_CHECKPOINT_BYTES=self.record["bytes"],
+            FROZEN_HISTORICAL_CHECKPOINT_SHA256=self.record["sha256"],
+            FROZEN_PUBLIC_CHECKPOINT_BYTES=self.public_checkpoint.stat().st_size,
+            FROZEN_PUBLIC_CHECKPOINT_SHA256=_sha256(self.public_checkpoint),
+            FROZEN_PUBLIC_TENSOR_FINGERPRINT_SHA256="d" * 64,
+            FROZEN_PUBLIC_TENSOR_COUNT=3,
             FROZEN_PRETRAINED_SHA256=self.record["pretrained_sha256"],
             FROZEN_SPLIT_SHA256=self.record["split_manifest_sha256"],
             FROZEN_ARCHIVED_RESULT_BYTES=self.archived_result.stat().st_size,
@@ -331,11 +417,14 @@ class ReadOnlyEvaluationTests(unittest.TestCase):
         self.fixture = RepresentativeFixture(self.root)
 
     def invoke(self, evaluator):
+        return self.invoke_argv(evaluator, self.fixture.argv())
+
+    def invoke_argv(self, evaluator, argv):
         stdout, stderr = io.StringIO(), io.StringIO()
         with self.fixture.frozen_identity_patch():
             with mock.patch.object(target, "_perform_model_evaluation", evaluator):
                 with contextlib.redirect_stdout(stdout), contextlib.redirect_stderr(stderr):
-                    code = target.main(self.fixture.argv())
+                    code = target.main(argv)
         return code, stdout.getvalue(), stderr.getvalue()
 
     def good_evaluator(self, **_kwargs):
@@ -351,17 +440,101 @@ class ReadOnlyEvaluationTests(unittest.TestCase):
         report = json.loads(stdout)
         self.assertEqual(report["status"], "pass")
         self.assertTrue(report["read_only"])
+        self.assertEqual(report["inputs"]["checkpoint"]["variant"], "historical")
         self.assertEqual(report["metric_scale"], "0_to_1")
         self.assertEqual(report["inputs"]["test_images_verified"], 3)
         self.assertEqual(
             report["runtime"]["historical_data_root"],
-            "/historical/server/AOD4/Images",
+            "historical-data-root",
         )
         self.assertEqual(
             report["runtime"]["relocated_data_root_used"],
             str(self.fixture.data_root.resolve()),
         )
         self.assertIn("synthetic model noise", stderr)
+
+    def test_public_replay_needs_no_historical_split_or_result(self):
+        observed = {}
+
+        def evaluator(**kwargs):
+            observed["split_file"] = kwargs["split_file"]
+            observed["split_sha256"] = kwargs["data_info"]["split_manifest_sha256"]
+            observed["client_sizes"] = kwargs["data_info"]["client_sizes"]
+            return copy.deepcopy(self.fixture.expected)
+
+        before = _tree_snapshot(self.root)
+        code, stdout, stderr = self.invoke_argv(
+            evaluator, self.fixture.public_argv()
+        )
+        self.assertEqual(code, 0, stderr)
+        self.assertEqual(before, _tree_snapshot(self.root))
+        report = json.loads(stdout)
+        self.assertEqual(report["runtime"]["manifest_mode"], "public_replay")
+        self.assertEqual(
+            report["inputs"]["checkpoint"]["variant"], "public_sanitized"
+        )
+        self.assertIsNone(report["runtime"]["historical_data_root"])
+        self.assertIsNone(report["runtime"]["relocated_data_root_used"])
+        self.assertFalse(report["inputs"]["archived_result_verified"])
+        self.assertIsNone(report["inputs"]["archived_result"])
+        self.assertEqual(
+            report["inputs"]["historical_split_manifest_sha256"],
+            self.fixture.record["split_manifest_sha256"],
+        )
+        self.assertEqual(
+            report["inputs"]["public_replay_manifest"]["sha256"],
+            _sha256(self.fixture.replay),
+        )
+        self.assertEqual(observed["split_file"], self.fixture.replay.resolve())
+        self.assertEqual(
+            observed["split_sha256"], self.fixture.record["split_manifest_sha256"]
+        )
+        self.assertEqual(observed["client_sizes"], [10, 11, 12])
+
+    def test_historical_and_public_checkpoint_identities_cannot_be_crossed(self):
+        evaluator = mock.Mock(side_effect=AssertionError("must not be called"))
+        historical_with_public = self.fixture.argv()
+        historical_with_public[1] = str(self.fixture.public_checkpoint)
+        code, stdout, stderr = self.invoke_argv(
+            evaluator, historical_with_public
+        )
+        self.assertEqual(code, 2)
+        self.assertEqual(stdout, "")
+        self.assertIn("historical checkpoint", stderr)
+        evaluator.assert_not_called()
+
+        evaluator.reset_mock()
+        public_with_historical = self.fixture.public_argv()
+        public_with_historical[1] = str(self.fixture.checkpoint)
+        code, stdout, stderr = self.invoke_argv(evaluator, public_with_historical)
+        self.assertEqual(code, 2)
+        self.assertEqual(stdout, "")
+        self.assertIn("public_sanitized checkpoint", stderr)
+        evaluator.assert_not_called()
+
+    def test_public_replay_mutation_fails_before_model_evaluation(self):
+        payload = copy.deepcopy(self.fixture.replay_payload)
+        payload["test"]["client_image_ids"][0]["image_ids"] = [1, 2]
+        _write_json(self.fixture.replay, payload)
+        evaluator = mock.Mock(side_effect=AssertionError("must not be called"))
+        code, stdout, stderr = self.invoke_argv(
+            evaluator, self.fixture.public_argv()
+        )
+        self.assertEqual(code, 2)
+        self.assertEqual(stdout, "")
+        self.assertIn("public replay manifest", stderr)
+        evaluator.assert_not_called()
+
+    def test_historical_mode_requires_archived_result(self):
+        argv = self.fixture.argv()
+        flag = argv.index("--reference-result")
+        del argv[flag:flag + 2]
+        evaluator = mock.Mock(side_effect=AssertionError("must not be called"))
+        code, stdout, stderr = self.invoke_argv(evaluator, argv)
+        self.assertEqual(code, 2)
+        self.assertEqual(stdout, "")
+        self.assertIn("--reference-result is required", stderr)
+        evaluator.assert_not_called()
 
     def test_fake_evaluator_receives_complete_temporary_yolo_layout(self):
         observed = {}

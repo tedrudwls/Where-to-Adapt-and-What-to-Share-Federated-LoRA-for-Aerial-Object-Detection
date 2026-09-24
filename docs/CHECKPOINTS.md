@@ -29,4 +29,27 @@ The user ran this verifier on the artifact host using draft PR code and reported
 
 The public [qualitative record](QUALITATIVE_TEST.md) consists of two static seed-43/client-1 figures and path-sanitized metadata for three validation-selected rank-8 endpoints. It is not a general checkpoint evaluation or AP recomputation interface. Do not use `main.py --resume` against archived primary directories as an evaluation shortcut: that path writes evaluation manifests, logs, plots and result JSONs. A separate [read-only evaluation vertical slice](READ_ONLY_EVALUATION.md) implements temporary test-only reconstruction for the indexed seed-42 FedLoRA-A checkpoint without editing the path-bound historical manifest. The authors report that its pinned GPU/model path passed the documented artifact-host acceptance command on 2026-09-23.
 
+The next release stage is the separate
+[paper-core checkpoint set](PAPER_CORE_RELEASE.md): Full FT, FedLoRA-AB,
+FedLoRA-A and FedLoRA-B for seeds 42/43/44 under the primary alpha-0.4
+protocol. It is an exact 12-checkpoint subset of this index and does not replace
+the representative replay artifact or imply that all 96 checkpoints have been
+published. A read-only 12/12 host audit has now pinned each path-sanitized
+public byte size, SHA-256 value and tensor fingerprint in the release
+specification. This identity pinning is a prepublication gate, not a download
+claim; the archive remains unpublished until the clean build, GPU replay and
+public re-download checks pass.
+
 The 96 checkpoint files are on the private artifact host and passed the user-reported host-side checksum check, but have **not yet been published as download assets or independently rehashed after download**. Links will be added only after publication and public-download verification. Until then, do not interpret an index record as proof that the corresponding binary is publicly available.
+
+## Minimal representative release gate
+
+Before uploading all 96 binaries, the project uses one small end-to-end release
+gate for `seed_42/fl_fedsa_lora_r8_a0.4`. The source checkpoint embeds two
+historical pretrained-weight paths, so it is not uploaded byte-for-byte. The
+[representative release procedure](REPRESENTATIVE_RELEASE.md) verifies the
+historical SHA-256, changes only those two path strings, proves identical tensor
+state, packages a compact path-free test manifest, and requires a clean public
+re-download plus GPU AP replay. The historical and sanitized public checkpoint
+identities are recorded separately; the checkpoint index remains the inventory
+of immutable historical files.

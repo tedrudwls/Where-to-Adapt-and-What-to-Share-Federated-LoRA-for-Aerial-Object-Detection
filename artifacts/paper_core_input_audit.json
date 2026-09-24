@@ -1,0 +1,969 @@
+{
+  "checkpoint_index": {
+    "bytes": 78251,
+    "relative_path": "artifacts/checkpoint_index.json",
+    "sha256": "f2b630085df03dfcf04e4ebac2b973968d8b28b3674354f47e4ab4805556c068"
+  },
+  "policy": "paper_core_12_checkpoint_read_only_prepublication_audit",
+  "protected_source_gate": {
+    "all_before_after_sha256_identical": true,
+    "files": [
+      {
+        "before_after_identical": true,
+        "bytes": 131947288,
+        "relative_path": "results/official_v6/seed_42/fl_full_ft_a0.4/weights/best_federated.pt",
+        "sha256": "79d937ea780e611ad3f93655d3fd7399293f0b3aaf3c4a1240b5a196236d426c"
+      },
+      {
+        "before_after_identical": true,
+        "bytes": 1930556,
+        "relative_path": "results/official_v6/seed_42/fl_lora_r8_a0.4/weights/best_federated.pt",
+        "sha256": "05ca4d38d7a3632dec54c6592da8d58bd5951f6fb11744b4d212fee6f1c618b3"
+      },
+      {
+        "before_after_identical": true,
+        "bytes": 3316516,
+        "relative_path": "results/official_v6/seed_42/fl_fedsa_lora_r8_a0.4/weights/best_federated.pt",
+        "sha256": "3ed025419506009465add698da75fef941c20c0b16eb347bb224820781b9cac4"
+      },
+      {
+        "before_after_identical": true,
+        "bytes": 4093860,
+        "relative_path": "results/official_v6/seed_42/fl_fixed_share_b_lora_r8_a0.4/weights/best_federated.pt",
+        "sha256": "6092d9500de123a1ce7f16ff3c0290c2bff02911bf1ffb0efa78e096d00c6c7d"
+      },
+      {
+        "before_after_identical": true,
+        "bytes": 131947288,
+        "relative_path": "results/official_v6/seed_43/fl_full_ft_a0.4/weights/best_federated.pt",
+        "sha256": "a9a417d0a416e970361df56dd95fca234958c5384ba637e0ad5a922e33be149a"
+      },
+      {
+        "before_after_identical": true,
+        "bytes": 1930556,
+        "relative_path": "results/official_v6/seed_43/fl_lora_r8_a0.4/weights/best_federated.pt",
+        "sha256": "ad928c84c5f1a82f7f88334ce5825422d1249bd59cb934eaeb3ddac3a751ff02"
+      },
+      {
+        "before_after_identical": true,
+        "bytes": 3316516,
+        "relative_path": "results/official_v6/seed_43/fl_fedsa_lora_r8_a0.4/weights/best_federated.pt",
+        "sha256": "c0ebf42091e3381c933a824c0b53f993af72c016c2e5015105ef90889448c616"
+      },
+      {
+        "before_after_identical": true,
+        "bytes": 4093796,
+        "relative_path": "results/official_v6/seed_43/fl_fixed_share_b_lora_r8_a0.4/weights/best_federated.pt",
+        "sha256": "f454435dc0a37530c919ccfff921ddfbe84fb18bc1919477cad186fdf513116d"
+      },
+      {
+        "before_after_identical": true,
+        "bytes": 131946200,
+        "relative_path": "results/official_v6/seed_44/fl_full_ft_a0.4/weights/best_federated.pt",
+        "sha256": "d1b668e1fe50b07fbd3eb079cefb5eeb087fc39dd81fa46bf6ece356572a2f21"
+      },
+      {
+        "before_after_identical": true,
+        "bytes": 1929468,
+        "relative_path": "results/official_v6/seed_44/fl_lora_r8_a0.4/weights/best_federated.pt",
+        "sha256": "f08d4926f15b0b8569ed080d228bee4df61aa55c0aa690b3d28e3f0f337c65e6"
+      },
+      {
+        "before_after_identical": true,
+        "bytes": 3315428,
+        "relative_path": "results/official_v6/seed_44/fl_fedsa_lora_r8_a0.4/weights/best_federated.pt",
+        "sha256": "9a794154670112920c77b893693c16c2969a002f036d19158604acd61ca62e97"
+      },
+      {
+        "before_after_identical": true,
+        "bytes": 4092708,
+        "relative_path": "results/official_v6/seed_44/fl_fixed_share_b_lora_r8_a0.4/weights/best_federated.pt",
+        "sha256": "6bf78aaa35fd214f95d9fb4462fb54ae37171bc08c9e2a7f1085d96e9708562c"
+      },
+      {
+        "before_after_identical": true,
+        "bytes": 78251,
+        "relative_path": "artifacts/checkpoint_index.json",
+        "sha256": "f2b630085df03dfcf04e4ebac2b973968d8b28b3674354f47e4ab4805556c068"
+      },
+      {
+        "before_after_identical": true,
+        "bytes": 9466,
+        "relative_path": "artifacts/paper_core_checkpoint_release_spec.json",
+        "sha256": "1ce05f1727f9590535452baf676064ed711403ffb66d068ed00f165887fdfee2"
+      }
+    ],
+    "protected_file_count": 14,
+    "status": "pass"
+  },
+  "records": [
+    {
+      "checkpoint_contract": {
+        "checkpoint_kind": "federated_personalized",
+        "federated_payload_policy": "global_full_model_state",
+        "local_lora_factor_role": null,
+        "local_personalized_states": [],
+        "schema_version": 5,
+        "selected_round": 19,
+        "selection": "best_macro_client_local_val_AP",
+        "shared_lora_factor_role": null,
+        "shared_state": {
+          "lora_A_tensor_count": 0,
+          "lora_B_tensor_count": 0,
+          "task_head_tensor_count": 15,
+          "tensor_bytes": 131526960,
+          "tensor_count": 941,
+          "tensor_elements": 32881618
+        },
+        "training_rounds_executed": 20
+      },
+      "experiment_id": "seed_42/fl_full_ft_a0.4",
+      "historical_checkpoint": {
+        "bytes": 131947288,
+        "relative_path": "results/official_v6/seed_42/fl_full_ft_a0.4/weights/best_federated.pt",
+        "release_asset_name": "seed_42__fl_full_ft_a0.4__best_federated.pt",
+        "sha256": "79d937ea780e611ad3f93655d3fd7399293f0b3aaf3c4a1240b5a196236d426c"
+      },
+      "method": "full_ft",
+      "partition": "dirichlet",
+      "partition_seed": 42,
+      "public_checkpoint_candidate": {
+        "bytes": 131947224,
+        "file_name": "seed_42__fl_full_ft_a0.4__best_federated.pt",
+        "path_replacements": [
+          {
+            "historical_value_sha256": "98049dad690d26a51a7cb724d87276d0d30964ae66c04e4fe61efd8d8a56ed30",
+            "json_pointer": "/architecture/model_weight_path",
+            "public_value": "external/rtdetr-l.pt"
+          },
+          {
+            "historical_value_sha256": "98049dad690d26a51a7cb724d87276d0d30964ae66c04e4fe61efd8d8a56ed30",
+            "json_pointer": "/experiment/model_weights",
+            "public_value": "external/rtdetr-l.pt"
+          }
+        ],
+        "release_asset_name": "seed_42__fl_full_ft_a0.4__best_federated.pt",
+        "residual_absolute_path_count": 0,
+        "sha256": "50e3c33ed8cf821c109d0504c9f47f4b8bc0e3ac2d4ea7fbe1009fc11ef60279",
+        "tensor_fingerprint": {
+          "algorithm": "recursive_path_dtype_shape_raw_bytes_sha256_v1",
+          "sha256": "56c5abee3cc372562023fbbc0500ff6f3880455e136a447ae42d61ea9c8f4831",
+          "tensor_count": 941
+        }
+      },
+      "rank": null,
+      "training_seed": 42
+    },
+    {
+      "checkpoint_contract": {
+        "checkpoint_kind": "federated_personalized",
+        "federated_payload_policy": "global_A_B_plus_global_task_head",
+        "local_lora_factor_role": null,
+        "local_personalized_states": [],
+        "schema_version": 5,
+        "selected_round": 20,
+        "selection": "best_macro_client_local_val_AP",
+        "shared_lora_factor_role": "A+B",
+        "shared_state": {
+          "lora_A_tensor_count": 54,
+          "lora_B_tensor_count": 54,
+          "task_head_tensor_count": 15,
+          "tensor_bytes": 1773168,
+          "tensor_count": 123,
+          "tensor_elements": 443292
+        },
+        "training_rounds_executed": 20
+      },
+      "experiment_id": "seed_42/fl_lora_r8_a0.4",
+      "historical_checkpoint": {
+        "bytes": 1930556,
+        "relative_path": "results/official_v6/seed_42/fl_lora_r8_a0.4/weights/best_federated.pt",
+        "release_asset_name": "seed_42__fl_lora_r8_a0.4__best_federated.pt",
+        "sha256": "05ca4d38d7a3632dec54c6592da8d58bd5951f6fb11744b4d212fee6f1c618b3"
+      },
+      "method": "lora",
+      "partition": "dirichlet",
+      "partition_seed": 42,
+      "public_checkpoint_candidate": {
+        "bytes": 1930492,
+        "file_name": "seed_42__fl_lora_r8_a0.4__best_federated.pt",
+        "path_replacements": [
+          {
+            "historical_value_sha256": "98049dad690d26a51a7cb724d87276d0d30964ae66c04e4fe61efd8d8a56ed30",
+            "json_pointer": "/architecture/model_weight_path",
+            "public_value": "external/rtdetr-l.pt"
+          },
+          {
+            "historical_value_sha256": "98049dad690d26a51a7cb724d87276d0d30964ae66c04e4fe61efd8d8a56ed30",
+            "json_pointer": "/experiment/model_weights",
+            "public_value": "external/rtdetr-l.pt"
+          }
+        ],
+        "release_asset_name": "seed_42__fl_lora_r8_a0.4__best_federated.pt",
+        "residual_absolute_path_count": 0,
+        "sha256": "2bd1f48417b5fe5765dd501e02f9e299d6e1d736a4aade9ae0d59ab9cea21d16",
+        "tensor_fingerprint": {
+          "algorithm": "recursive_path_dtype_shape_raw_bytes_sha256_v1",
+          "sha256": "0f45f698a934ba13016659e1d264d615ba226fadceb4170b9891941ca05109c6",
+          "tensor_count": 123
+        }
+      },
+      "rank": 8,
+      "training_seed": 42
+    },
+    {
+      "checkpoint_contract": {
+        "checkpoint_kind": "federated_personalized",
+        "federated_payload_policy": "global_A_plus_global_task_head__local_B",
+        "local_lora_factor_role": "B",
+        "local_personalized_states": [
+          {
+            "lora_A_tensor_count": 0,
+            "lora_B_tensor_count": 54,
+            "task_head_tensor_count": 0,
+            "tensor_bytes": 675840,
+            "tensor_count": 54,
+            "tensor_elements": 168960
+          },
+          {
+            "lora_A_tensor_count": 0,
+            "lora_B_tensor_count": 54,
+            "task_head_tensor_count": 0,
+            "tensor_bytes": 675840,
+            "tensor_count": 54,
+            "tensor_elements": 168960
+          },
+          {
+            "lora_A_tensor_count": 0,
+            "lora_B_tensor_count": 54,
+            "task_head_tensor_count": 0,
+            "tensor_bytes": 675840,
+            "tensor_count": 54,
+            "tensor_elements": 168960
+          }
+        ],
+        "schema_version": 5,
+        "selected_round": 20,
+        "selection": "best_macro_client_local_val_AP",
+        "shared_lora_factor_role": "A",
+        "shared_state": {
+          "lora_A_tensor_count": 54,
+          "lora_B_tensor_count": 0,
+          "task_head_tensor_count": 15,
+          "tensor_bytes": 1097328,
+          "tensor_count": 69,
+          "tensor_elements": 274332
+        },
+        "training_rounds_executed": 20
+      },
+      "experiment_id": "seed_42/fl_fedsa_lora_r8_a0.4",
+      "historical_checkpoint": {
+        "bytes": 3316516,
+        "relative_path": "results/official_v6/seed_42/fl_fedsa_lora_r8_a0.4/weights/best_federated.pt",
+        "release_asset_name": "seed_42__fl_fedsa_lora_r8_a0.4__best_federated.pt",
+        "sha256": "3ed025419506009465add698da75fef941c20c0b16eb347bb224820781b9cac4"
+      },
+      "method": "fedsa_lora",
+      "partition": "dirichlet",
+      "partition_seed": 42,
+      "public_checkpoint_candidate": {
+        "bytes": 3316452,
+        "file_name": "seed_42__fl_fedsa_lora_r8_a0.4__best_federated.pt",
+        "path_replacements": [
+          {
+            "historical_value_sha256": "98049dad690d26a51a7cb724d87276d0d30964ae66c04e4fe61efd8d8a56ed30",
+            "json_pointer": "/architecture/model_weight_path",
+            "public_value": "external/rtdetr-l.pt"
+          },
+          {
+            "historical_value_sha256": "98049dad690d26a51a7cb724d87276d0d30964ae66c04e4fe61efd8d8a56ed30",
+            "json_pointer": "/experiment/model_weights",
+            "public_value": "external/rtdetr-l.pt"
+          }
+        ],
+        "release_asset_name": "seed_42__fl_fedsa_lora_r8_a0.4__best_federated.pt",
+        "residual_absolute_path_count": 0,
+        "sha256": "391205473ad8de24af56ba1b566e54a6f305dd0b79806cb468583e84e464fa14",
+        "tensor_fingerprint": {
+          "algorithm": "recursive_path_dtype_shape_raw_bytes_sha256_v1",
+          "sha256": "b42e1e811238caf1ec76e788547dbcf46d8f390b3b0e63864cf3d303e88c6d4f",
+          "tensor_count": 231
+        }
+      },
+      "rank": 8,
+      "training_seed": 42
+    },
+    {
+      "checkpoint_contract": {
+        "checkpoint_kind": "federated_personalized",
+        "federated_payload_policy": "global_B_plus_global_task_head__local_A",
+        "local_lora_factor_role": "A",
+        "local_personalized_states": [
+          {
+            "lora_A_tensor_count": 54,
+            "lora_B_tensor_count": 0,
+            "task_head_tensor_count": 0,
+            "tensor_bytes": 1064448,
+            "tensor_count": 54,
+            "tensor_elements": 266112
+          },
+          {
+            "lora_A_tensor_count": 54,
+            "lora_B_tensor_count": 0,
+            "task_head_tensor_count": 0,
+            "tensor_bytes": 1064448,
+            "tensor_count": 54,
+            "tensor_elements": 266112
+          },
+          {
+            "lora_A_tensor_count": 54,
+            "lora_B_tensor_count": 0,
+            "task_head_tensor_count": 0,
+            "tensor_bytes": 1064448,
+            "tensor_count": 54,
+            "tensor_elements": 266112
+          }
+        ],
+        "schema_version": 5,
+        "selected_round": 20,
+        "selection": "best_macro_client_local_val_AP",
+        "shared_lora_factor_role": "B",
+        "shared_state": {
+          "lora_A_tensor_count": 0,
+          "lora_B_tensor_count": 54,
+          "task_head_tensor_count": 15,
+          "tensor_bytes": 708720,
+          "tensor_count": 69,
+          "tensor_elements": 177180
+        },
+        "training_rounds_executed": 20
+      },
+      "experiment_id": "seed_42/fl_fixed_share_b_lora_r8_a0.4",
+      "historical_checkpoint": {
+        "bytes": 4093860,
+        "relative_path": "results/official_v6/seed_42/fl_fixed_share_b_lora_r8_a0.4/weights/best_federated.pt",
+        "release_asset_name": "seed_42__fl_fixed_share_b_lora_r8_a0.4__best_federated.pt",
+        "sha256": "6092d9500de123a1ce7f16ff3c0290c2bff02911bf1ffb0efa78e096d00c6c7d"
+      },
+      "method": "fixed_share_b_lora",
+      "partition": "dirichlet",
+      "partition_seed": 42,
+      "public_checkpoint_candidate": {
+        "bytes": 4093796,
+        "file_name": "seed_42__fl_fixed_share_b_lora_r8_a0.4__best_federated.pt",
+        "path_replacements": [
+          {
+            "historical_value_sha256": "98049dad690d26a51a7cb724d87276d0d30964ae66c04e4fe61efd8d8a56ed30",
+            "json_pointer": "/architecture/model_weight_path",
+            "public_value": "external/rtdetr-l.pt"
+          },
+          {
+            "historical_value_sha256": "98049dad690d26a51a7cb724d87276d0d30964ae66c04e4fe61efd8d8a56ed30",
+            "json_pointer": "/experiment/model_weights",
+            "public_value": "external/rtdetr-l.pt"
+          }
+        ],
+        "release_asset_name": "seed_42__fl_fixed_share_b_lora_r8_a0.4__best_federated.pt",
+        "residual_absolute_path_count": 0,
+        "sha256": "8be445020d179828fd337666a9b85648468d9f36268bd3cfadb6707475ccab9c",
+        "tensor_fingerprint": {
+          "algorithm": "recursive_path_dtype_shape_raw_bytes_sha256_v1",
+          "sha256": "8680f5e9c3fe69968966a07e89a1af677ee3ec2483d2ea43e36477c316e1ba9e",
+          "tensor_count": 231
+        }
+      },
+      "rank": 8,
+      "training_seed": 42
+    },
+    {
+      "checkpoint_contract": {
+        "checkpoint_kind": "federated_personalized",
+        "federated_payload_policy": "global_full_model_state",
+        "local_lora_factor_role": null,
+        "local_personalized_states": [],
+        "schema_version": 5,
+        "selected_round": 20,
+        "selection": "best_macro_client_local_val_AP",
+        "shared_lora_factor_role": null,
+        "shared_state": {
+          "lora_A_tensor_count": 0,
+          "lora_B_tensor_count": 0,
+          "task_head_tensor_count": 15,
+          "tensor_bytes": 131526960,
+          "tensor_count": 941,
+          "tensor_elements": 32881618
+        },
+        "training_rounds_executed": 20
+      },
+      "experiment_id": "seed_43/fl_full_ft_a0.4",
+      "historical_checkpoint": {
+        "bytes": 131947288,
+        "relative_path": "results/official_v6/seed_43/fl_full_ft_a0.4/weights/best_federated.pt",
+        "release_asset_name": "seed_43__fl_full_ft_a0.4__best_federated.pt",
+        "sha256": "a9a417d0a416e970361df56dd95fca234958c5384ba637e0ad5a922e33be149a"
+      },
+      "method": "full_ft",
+      "partition": "dirichlet",
+      "partition_seed": 43,
+      "public_checkpoint_candidate": {
+        "bytes": 131947224,
+        "file_name": "seed_43__fl_full_ft_a0.4__best_federated.pt",
+        "path_replacements": [
+          {
+            "historical_value_sha256": "98049dad690d26a51a7cb724d87276d0d30964ae66c04e4fe61efd8d8a56ed30",
+            "json_pointer": "/architecture/model_weight_path",
+            "public_value": "external/rtdetr-l.pt"
+          },
+          {
+            "historical_value_sha256": "98049dad690d26a51a7cb724d87276d0d30964ae66c04e4fe61efd8d8a56ed30",
+            "json_pointer": "/experiment/model_weights",
+            "public_value": "external/rtdetr-l.pt"
+          }
+        ],
+        "release_asset_name": "seed_43__fl_full_ft_a0.4__best_federated.pt",
+        "residual_absolute_path_count": 0,
+        "sha256": "55985dc7a5dcc5909a7bcf72c04908f2b848b5f5ec9753f2250b6f4be6bab5ac",
+        "tensor_fingerprint": {
+          "algorithm": "recursive_path_dtype_shape_raw_bytes_sha256_v1",
+          "sha256": "6a441c3fb13b73114063d2d10200cc13cf7d652f73f1185192ed686cc697ec2d",
+          "tensor_count": 941
+        }
+      },
+      "rank": null,
+      "training_seed": 43
+    },
+    {
+      "checkpoint_contract": {
+        "checkpoint_kind": "federated_personalized",
+        "federated_payload_policy": "global_A_B_plus_global_task_head",
+        "local_lora_factor_role": null,
+        "local_personalized_states": [],
+        "schema_version": 5,
+        "selected_round": 20,
+        "selection": "best_macro_client_local_val_AP",
+        "shared_lora_factor_role": "A+B",
+        "shared_state": {
+          "lora_A_tensor_count": 54,
+          "lora_B_tensor_count": 54,
+          "task_head_tensor_count": 15,
+          "tensor_bytes": 1773168,
+          "tensor_count": 123,
+          "tensor_elements": 443292
+        },
+        "training_rounds_executed": 20
+      },
+      "experiment_id": "seed_43/fl_lora_r8_a0.4",
+      "historical_checkpoint": {
+        "bytes": 1930556,
+        "relative_path": "results/official_v6/seed_43/fl_lora_r8_a0.4/weights/best_federated.pt",
+        "release_asset_name": "seed_43__fl_lora_r8_a0.4__best_federated.pt",
+        "sha256": "ad928c84c5f1a82f7f88334ce5825422d1249bd59cb934eaeb3ddac3a751ff02"
+      },
+      "method": "lora",
+      "partition": "dirichlet",
+      "partition_seed": 43,
+      "public_checkpoint_candidate": {
+        "bytes": 1930492,
+        "file_name": "seed_43__fl_lora_r8_a0.4__best_federated.pt",
+        "path_replacements": [
+          {
+            "historical_value_sha256": "98049dad690d26a51a7cb724d87276d0d30964ae66c04e4fe61efd8d8a56ed30",
+            "json_pointer": "/architecture/model_weight_path",
+            "public_value": "external/rtdetr-l.pt"
+          },
+          {
+            "historical_value_sha256": "98049dad690d26a51a7cb724d87276d0d30964ae66c04e4fe61efd8d8a56ed30",
+            "json_pointer": "/experiment/model_weights",
+            "public_value": "external/rtdetr-l.pt"
+          }
+        ],
+        "release_asset_name": "seed_43__fl_lora_r8_a0.4__best_federated.pt",
+        "residual_absolute_path_count": 0,
+        "sha256": "66214a9a22ab8042b1a6abd1353d10ec56e06ca11c612c5580181ec0342e372b",
+        "tensor_fingerprint": {
+          "algorithm": "recursive_path_dtype_shape_raw_bytes_sha256_v1",
+          "sha256": "4679b3a05262b9c299036ad3d3707f0ff8e5c215684cccf585cab5a6dc501078",
+          "tensor_count": 123
+        }
+      },
+      "rank": 8,
+      "training_seed": 43
+    },
+    {
+      "checkpoint_contract": {
+        "checkpoint_kind": "federated_personalized",
+        "federated_payload_policy": "global_A_plus_global_task_head__local_B",
+        "local_lora_factor_role": "B",
+        "local_personalized_states": [
+          {
+            "lora_A_tensor_count": 0,
+            "lora_B_tensor_count": 54,
+            "task_head_tensor_count": 0,
+            "tensor_bytes": 675840,
+            "tensor_count": 54,
+            "tensor_elements": 168960
+          },
+          {
+            "lora_A_tensor_count": 0,
+            "lora_B_tensor_count": 54,
+            "task_head_tensor_count": 0,
+            "tensor_bytes": 675840,
+            "tensor_count": 54,
+            "tensor_elements": 168960
+          },
+          {
+            "lora_A_tensor_count": 0,
+            "lora_B_tensor_count": 54,
+            "task_head_tensor_count": 0,
+            "tensor_bytes": 675840,
+            "tensor_count": 54,
+            "tensor_elements": 168960
+          }
+        ],
+        "schema_version": 5,
+        "selected_round": 20,
+        "selection": "best_macro_client_local_val_AP",
+        "shared_lora_factor_role": "A",
+        "shared_state": {
+          "lora_A_tensor_count": 54,
+          "lora_B_tensor_count": 0,
+          "task_head_tensor_count": 15,
+          "tensor_bytes": 1097328,
+          "tensor_count": 69,
+          "tensor_elements": 274332
+        },
+        "training_rounds_executed": 20
+      },
+      "experiment_id": "seed_43/fl_fedsa_lora_r8_a0.4",
+      "historical_checkpoint": {
+        "bytes": 3316516,
+        "relative_path": "results/official_v6/seed_43/fl_fedsa_lora_r8_a0.4/weights/best_federated.pt",
+        "release_asset_name": "seed_43__fl_fedsa_lora_r8_a0.4__best_federated.pt",
+        "sha256": "c0ebf42091e3381c933a824c0b53f993af72c016c2e5015105ef90889448c616"
+      },
+      "method": "fedsa_lora",
+      "partition": "dirichlet",
+      "partition_seed": 43,
+      "public_checkpoint_candidate": {
+        "bytes": 3316452,
+        "file_name": "seed_43__fl_fedsa_lora_r8_a0.4__best_federated.pt",
+        "path_replacements": [
+          {
+            "historical_value_sha256": "98049dad690d26a51a7cb724d87276d0d30964ae66c04e4fe61efd8d8a56ed30",
+            "json_pointer": "/architecture/model_weight_path",
+            "public_value": "external/rtdetr-l.pt"
+          },
+          {
+            "historical_value_sha256": "98049dad690d26a51a7cb724d87276d0d30964ae66c04e4fe61efd8d8a56ed30",
+            "json_pointer": "/experiment/model_weights",
+            "public_value": "external/rtdetr-l.pt"
+          }
+        ],
+        "release_asset_name": "seed_43__fl_fedsa_lora_r8_a0.4__best_federated.pt",
+        "residual_absolute_path_count": 0,
+        "sha256": "bcd02b63edd5c19f1949fded5268c4e70215e4aea84e816be0c30fd252e10e49",
+        "tensor_fingerprint": {
+          "algorithm": "recursive_path_dtype_shape_raw_bytes_sha256_v1",
+          "sha256": "554c124dc25dc0c0fec04450a20f1564f08aef9c1138a6521ef8227d40603b6c",
+          "tensor_count": 231
+        }
+      },
+      "rank": 8,
+      "training_seed": 43
+    },
+    {
+      "checkpoint_contract": {
+        "checkpoint_kind": "federated_personalized",
+        "federated_payload_policy": "global_B_plus_global_task_head__local_A",
+        "local_lora_factor_role": "A",
+        "local_personalized_states": [
+          {
+            "lora_A_tensor_count": 54,
+            "lora_B_tensor_count": 0,
+            "task_head_tensor_count": 0,
+            "tensor_bytes": 1064448,
+            "tensor_count": 54,
+            "tensor_elements": 266112
+          },
+          {
+            "lora_A_tensor_count": 54,
+            "lora_B_tensor_count": 0,
+            "task_head_tensor_count": 0,
+            "tensor_bytes": 1064448,
+            "tensor_count": 54,
+            "tensor_elements": 266112
+          },
+          {
+            "lora_A_tensor_count": 54,
+            "lora_B_tensor_count": 0,
+            "task_head_tensor_count": 0,
+            "tensor_bytes": 1064448,
+            "tensor_count": 54,
+            "tensor_elements": 266112
+          }
+        ],
+        "schema_version": 5,
+        "selected_round": 6,
+        "selection": "best_macro_client_local_val_AP",
+        "shared_lora_factor_role": "B",
+        "shared_state": {
+          "lora_A_tensor_count": 0,
+          "lora_B_tensor_count": 54,
+          "task_head_tensor_count": 15,
+          "tensor_bytes": 708720,
+          "tensor_count": 69,
+          "tensor_elements": 177180
+        },
+        "training_rounds_executed": 20
+      },
+      "experiment_id": "seed_43/fl_fixed_share_b_lora_r8_a0.4",
+      "historical_checkpoint": {
+        "bytes": 4093796,
+        "relative_path": "results/official_v6/seed_43/fl_fixed_share_b_lora_r8_a0.4/weights/best_federated.pt",
+        "release_asset_name": "seed_43__fl_fixed_share_b_lora_r8_a0.4__best_federated.pt",
+        "sha256": "f454435dc0a37530c919ccfff921ddfbe84fb18bc1919477cad186fdf513116d"
+      },
+      "method": "fixed_share_b_lora",
+      "partition": "dirichlet",
+      "partition_seed": 43,
+      "public_checkpoint_candidate": {
+        "bytes": 4093732,
+        "file_name": "seed_43__fl_fixed_share_b_lora_r8_a0.4__best_federated.pt",
+        "path_replacements": [
+          {
+            "historical_value_sha256": "98049dad690d26a51a7cb724d87276d0d30964ae66c04e4fe61efd8d8a56ed30",
+            "json_pointer": "/architecture/model_weight_path",
+            "public_value": "external/rtdetr-l.pt"
+          },
+          {
+            "historical_value_sha256": "98049dad690d26a51a7cb724d87276d0d30964ae66c04e4fe61efd8d8a56ed30",
+            "json_pointer": "/experiment/model_weights",
+            "public_value": "external/rtdetr-l.pt"
+          }
+        ],
+        "release_asset_name": "seed_43__fl_fixed_share_b_lora_r8_a0.4__best_federated.pt",
+        "residual_absolute_path_count": 0,
+        "sha256": "0fd77167da7753e16d7a62a71816dcd07cb473078d9d09aba0f05059ae5aec3a",
+        "tensor_fingerprint": {
+          "algorithm": "recursive_path_dtype_shape_raw_bytes_sha256_v1",
+          "sha256": "f1d9dad03b02582ef33f764a76eaff3baeeeb68b80d9d01782f7c905c541d5e2",
+          "tensor_count": 231
+        }
+      },
+      "rank": 8,
+      "training_seed": 43
+    },
+    {
+      "checkpoint_contract": {
+        "checkpoint_kind": "federated_personalized",
+        "federated_payload_policy": "global_full_model_state",
+        "local_lora_factor_role": null,
+        "local_personalized_states": [],
+        "schema_version": 5,
+        "selected_round": 19,
+        "selection": "best_macro_client_local_val_AP",
+        "shared_lora_factor_role": null,
+        "shared_state": {
+          "lora_A_tensor_count": 0,
+          "lora_B_tensor_count": 0,
+          "task_head_tensor_count": 15,
+          "tensor_bytes": 131526960,
+          "tensor_count": 941,
+          "tensor_elements": 32881618
+        },
+        "training_rounds_executed": 20
+      },
+      "experiment_id": "seed_44/fl_full_ft_a0.4",
+      "historical_checkpoint": {
+        "bytes": 131946200,
+        "relative_path": "results/official_v6/seed_44/fl_full_ft_a0.4/weights/best_federated.pt",
+        "release_asset_name": "seed_44__fl_full_ft_a0.4__best_federated.pt",
+        "sha256": "d1b668e1fe50b07fbd3eb079cefb5eeb087fc39dd81fa46bf6ece356572a2f21"
+      },
+      "method": "full_ft",
+      "partition": "dirichlet",
+      "partition_seed": 44,
+      "public_checkpoint_candidate": {
+        "bytes": 131946136,
+        "file_name": "seed_44__fl_full_ft_a0.4__best_federated.pt",
+        "path_replacements": [
+          {
+            "historical_value_sha256": "98049dad690d26a51a7cb724d87276d0d30964ae66c04e4fe61efd8d8a56ed30",
+            "json_pointer": "/architecture/model_weight_path",
+            "public_value": "external/rtdetr-l.pt"
+          },
+          {
+            "historical_value_sha256": "98049dad690d26a51a7cb724d87276d0d30964ae66c04e4fe61efd8d8a56ed30",
+            "json_pointer": "/experiment/model_weights",
+            "public_value": "external/rtdetr-l.pt"
+          }
+        ],
+        "release_asset_name": "seed_44__fl_full_ft_a0.4__best_federated.pt",
+        "residual_absolute_path_count": 0,
+        "sha256": "4e11b12b07c01a090eb7a4d3d24f728249e1821f4a22a4d0120054a95437626b",
+        "tensor_fingerprint": {
+          "algorithm": "recursive_path_dtype_shape_raw_bytes_sha256_v1",
+          "sha256": "5ab7039b92e1b7c338efb2b2e8b98a3fd978bd49626725947db9d7eff47062e7",
+          "tensor_count": 941
+        }
+      },
+      "rank": null,
+      "training_seed": 44
+    },
+    {
+      "checkpoint_contract": {
+        "checkpoint_kind": "federated_personalized",
+        "federated_payload_policy": "global_A_B_plus_global_task_head",
+        "local_lora_factor_role": null,
+        "local_personalized_states": [],
+        "schema_version": 5,
+        "selected_round": 20,
+        "selection": "best_macro_client_local_val_AP",
+        "shared_lora_factor_role": "A+B",
+        "shared_state": {
+          "lora_A_tensor_count": 54,
+          "lora_B_tensor_count": 54,
+          "task_head_tensor_count": 15,
+          "tensor_bytes": 1773168,
+          "tensor_count": 123,
+          "tensor_elements": 443292
+        },
+        "training_rounds_executed": 20
+      },
+      "experiment_id": "seed_44/fl_lora_r8_a0.4",
+      "historical_checkpoint": {
+        "bytes": 1929468,
+        "relative_path": "results/official_v6/seed_44/fl_lora_r8_a0.4/weights/best_federated.pt",
+        "release_asset_name": "seed_44__fl_lora_r8_a0.4__best_federated.pt",
+        "sha256": "f08d4926f15b0b8569ed080d228bee4df61aa55c0aa690b3d28e3f0f337c65e6"
+      },
+      "method": "lora",
+      "partition": "dirichlet",
+      "partition_seed": 44,
+      "public_checkpoint_candidate": {
+        "bytes": 1929404,
+        "file_name": "seed_44__fl_lora_r8_a0.4__best_federated.pt",
+        "path_replacements": [
+          {
+            "historical_value_sha256": "98049dad690d26a51a7cb724d87276d0d30964ae66c04e4fe61efd8d8a56ed30",
+            "json_pointer": "/architecture/model_weight_path",
+            "public_value": "external/rtdetr-l.pt"
+          },
+          {
+            "historical_value_sha256": "98049dad690d26a51a7cb724d87276d0d30964ae66c04e4fe61efd8d8a56ed30",
+            "json_pointer": "/experiment/model_weights",
+            "public_value": "external/rtdetr-l.pt"
+          }
+        ],
+        "release_asset_name": "seed_44__fl_lora_r8_a0.4__best_federated.pt",
+        "residual_absolute_path_count": 0,
+        "sha256": "a5531a4954f66512dc739a412dacbd7edf7876b1606ff9791ab3263aae88434b",
+        "tensor_fingerprint": {
+          "algorithm": "recursive_path_dtype_shape_raw_bytes_sha256_v1",
+          "sha256": "cf0303aedb752cb1b0849129d69730514b58af4ff431aa9ac1685205ecfb9485",
+          "tensor_count": 123
+        }
+      },
+      "rank": 8,
+      "training_seed": 44
+    },
+    {
+      "checkpoint_contract": {
+        "checkpoint_kind": "federated_personalized",
+        "federated_payload_policy": "global_A_plus_global_task_head__local_B",
+        "local_lora_factor_role": "B",
+        "local_personalized_states": [
+          {
+            "lora_A_tensor_count": 0,
+            "lora_B_tensor_count": 54,
+            "task_head_tensor_count": 0,
+            "tensor_bytes": 675840,
+            "tensor_count": 54,
+            "tensor_elements": 168960
+          },
+          {
+            "lora_A_tensor_count": 0,
+            "lora_B_tensor_count": 54,
+            "task_head_tensor_count": 0,
+            "tensor_bytes": 675840,
+            "tensor_count": 54,
+            "tensor_elements": 168960
+          },
+          {
+            "lora_A_tensor_count": 0,
+            "lora_B_tensor_count": 54,
+            "task_head_tensor_count": 0,
+            "tensor_bytes": 675840,
+            "tensor_count": 54,
+            "tensor_elements": 168960
+          }
+        ],
+        "schema_version": 5,
+        "selected_round": 20,
+        "selection": "best_macro_client_local_val_AP",
+        "shared_lora_factor_role": "A",
+        "shared_state": {
+          "lora_A_tensor_count": 54,
+          "lora_B_tensor_count": 0,
+          "task_head_tensor_count": 15,
+          "tensor_bytes": 1097328,
+          "tensor_count": 69,
+          "tensor_elements": 274332
+        },
+        "training_rounds_executed": 20
+      },
+      "experiment_id": "seed_44/fl_fedsa_lora_r8_a0.4",
+      "historical_checkpoint": {
+        "bytes": 3315428,
+        "relative_path": "results/official_v6/seed_44/fl_fedsa_lora_r8_a0.4/weights/best_federated.pt",
+        "release_asset_name": "seed_44__fl_fedsa_lora_r8_a0.4__best_federated.pt",
+        "sha256": "9a794154670112920c77b893693c16c2969a002f036d19158604acd61ca62e97"
+      },
+      "method": "fedsa_lora",
+      "partition": "dirichlet",
+      "partition_seed": 44,
+      "public_checkpoint_candidate": {
+        "bytes": 3315364,
+        "file_name": "seed_44__fl_fedsa_lora_r8_a0.4__best_federated.pt",
+        "path_replacements": [
+          {
+            "historical_value_sha256": "98049dad690d26a51a7cb724d87276d0d30964ae66c04e4fe61efd8d8a56ed30",
+            "json_pointer": "/architecture/model_weight_path",
+            "public_value": "external/rtdetr-l.pt"
+          },
+          {
+            "historical_value_sha256": "98049dad690d26a51a7cb724d87276d0d30964ae66c04e4fe61efd8d8a56ed30",
+            "json_pointer": "/experiment/model_weights",
+            "public_value": "external/rtdetr-l.pt"
+          }
+        ],
+        "release_asset_name": "seed_44__fl_fedsa_lora_r8_a0.4__best_federated.pt",
+        "residual_absolute_path_count": 0,
+        "sha256": "282ba2cf4f14f4320e1ac601e76a1791c6a72c49d7c2b13c222242fd6a3976bb",
+        "tensor_fingerprint": {
+          "algorithm": "recursive_path_dtype_shape_raw_bytes_sha256_v1",
+          "sha256": "0a5a66d7289a5cfc405124bf4d1f65b4466a5dd1ceee330ce13affd1eec76a3f",
+          "tensor_count": 231
+        }
+      },
+      "rank": 8,
+      "training_seed": 44
+    },
+    {
+      "checkpoint_contract": {
+        "checkpoint_kind": "federated_personalized",
+        "federated_payload_policy": "global_B_plus_global_task_head__local_A",
+        "local_lora_factor_role": "A",
+        "local_personalized_states": [
+          {
+            "lora_A_tensor_count": 54,
+            "lora_B_tensor_count": 0,
+            "task_head_tensor_count": 0,
+            "tensor_bytes": 1064448,
+            "tensor_count": 54,
+            "tensor_elements": 266112
+          },
+          {
+            "lora_A_tensor_count": 54,
+            "lora_B_tensor_count": 0,
+            "task_head_tensor_count": 0,
+            "tensor_bytes": 1064448,
+            "tensor_count": 54,
+            "tensor_elements": 266112
+          },
+          {
+            "lora_A_tensor_count": 54,
+            "lora_B_tensor_count": 0,
+            "task_head_tensor_count": 0,
+            "tensor_bytes": 1064448,
+            "tensor_count": 54,
+            "tensor_elements": 266112
+          }
+        ],
+        "schema_version": 5,
+        "selected_round": 20,
+        "selection": "best_macro_client_local_val_AP",
+        "shared_lora_factor_role": "B",
+        "shared_state": {
+          "lora_A_tensor_count": 0,
+          "lora_B_tensor_count": 54,
+          "task_head_tensor_count": 15,
+          "tensor_bytes": 708720,
+          "tensor_count": 69,
+          "tensor_elements": 177180
+        },
+        "training_rounds_executed": 20
+      },
+      "experiment_id": "seed_44/fl_fixed_share_b_lora_r8_a0.4",
+      "historical_checkpoint": {
+        "bytes": 4092708,
+        "relative_path": "results/official_v6/seed_44/fl_fixed_share_b_lora_r8_a0.4/weights/best_federated.pt",
+        "release_asset_name": "seed_44__fl_fixed_share_b_lora_r8_a0.4__best_federated.pt",
+        "sha256": "6bf78aaa35fd214f95d9fb4462fb54ae37171bc08c9e2a7f1085d96e9708562c"
+      },
+      "method": "fixed_share_b_lora",
+      "partition": "dirichlet",
+      "partition_seed": 44,
+      "public_checkpoint_candidate": {
+        "bytes": 4092644,
+        "file_name": "seed_44__fl_fixed_share_b_lora_r8_a0.4__best_federated.pt",
+        "path_replacements": [
+          {
+            "historical_value_sha256": "98049dad690d26a51a7cb724d87276d0d30964ae66c04e4fe61efd8d8a56ed30",
+            "json_pointer": "/architecture/model_weight_path",
+            "public_value": "external/rtdetr-l.pt"
+          },
+          {
+            "historical_value_sha256": "98049dad690d26a51a7cb724d87276d0d30964ae66c04e4fe61efd8d8a56ed30",
+            "json_pointer": "/experiment/model_weights",
+            "public_value": "external/rtdetr-l.pt"
+          }
+        ],
+        "release_asset_name": "seed_44__fl_fixed_share_b_lora_r8_a0.4__best_federated.pt",
+        "residual_absolute_path_count": 0,
+        "sha256": "30359c79c8638da8f06c045fa87ce36dfcc0114a586bb5475c491d165f92917e",
+        "tensor_fingerprint": {
+          "algorithm": "recursive_path_dtype_shape_raw_bytes_sha256_v1",
+          "sha256": "ab1821bf945ddced2b136ac69d02ee74a2e12bf7c6e8dc2fd1789a70d1e806f2",
+          "tensor_count": 231
+        }
+      },
+      "rank": 8,
+      "training_seed": 44
+    }
+  ],
+  "release_spec": {
+    "bytes": 9466,
+    "relative_path": "artifacts/paper_core_checkpoint_release_spec.json",
+    "release_id": "paper-core-checkpoints-v1.0.0",
+    "sha256": "1ce05f1727f9590535452baf676064ed711403ffb66d068ed00f165887fdfee2"
+  },
+  "schema_version": 1,
+  "scope": {
+    "dirichlet_alpha": 0.4,
+    "lora_rank": 8,
+    "lora_targets": "backbone_plus_decoder",
+    "methods": [
+      "full_ft",
+      "lora",
+      "fedsa_lora",
+      "fixed_share_b_lora"
+    ],
+    "partition": "dirichlet",
+    "record_count": 12,
+    "training_and_partition_seeds": [
+      42,
+      43,
+      44
+    ]
+  },
+  "serialization_runtime": {
+    "python": "3.9.18",
+    "torch": "2.5.1+cu124"
+  },
+  "status": "pass",
+  "totals": {
+    "historical_checkpoint_bytes": 423860180,
+    "public_candidate_bytes": 423859412
+  }
+}
