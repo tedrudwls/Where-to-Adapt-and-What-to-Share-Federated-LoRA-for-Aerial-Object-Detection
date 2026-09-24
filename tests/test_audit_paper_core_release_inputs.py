@@ -398,7 +398,10 @@ class CoreAuditTests(unittest.TestCase):
             "relative_path": "artifacts/checkpoint_index.json",
             "sha256": _sha256(index),
         }
-        with self.assertRaisesRegex(target.CoreAuditError, "Release-spec/index mismatch"):
+        with self.assertRaisesRegex(
+            target.CoreAuditError,
+            "Discovery spec unexpectedly pins a public identity",
+        ):
             target._validate_spec_against_index(
                 target._load_release_spec(spec), selected, index_identity
             )

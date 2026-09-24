@@ -11,6 +11,7 @@ from pathlib import Path
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 SPEC_PATH = PROJECT_ROOT / "artifacts" / "paper_core_checkpoint_release_spec.json"
 INDEX_PATH = PROJECT_ROOT / "artifacts" / "checkpoint_index.json"
+AUDIT_PATH = PROJECT_ROOT / "artifacts" / "paper_core_input_audit.json"
 
 
 class PaperCoreReleaseSpecTests(unittest.TestCase):
@@ -18,8 +19,15 @@ class PaperCoreReleaseSpecTests(unittest.TestCase):
     def setUpClass(cls):
         cls.spec = json.loads(SPEC_PATH.read_text(encoding="utf-8"))
         cls.index = json.loads(INDEX_PATH.read_text(encoding="utf-8"))
+        cls.audit = json.loads(AUDIT_PATH.read_text(encoding="utf-8"))
 
     def test_spec_selects_exact_primary_method_seed_matrix(self):
+        self.assertEqual(self.spec["status"], "public_identities_pinned")
+        self.assertEqual(
+            self.spec["archive_name"],
+            "fedlora-paper-core-checkpoints-v1.0.0.tar.gz",
+        )
+        self.assertEqual(self.spec["archive_root"], "paper-core-checkpoints")
         records = self.spec["records"]
         expected = {
             (seed, method)
@@ -87,10 +95,88 @@ class PaperCoreReleaseSpecTests(unittest.TestCase):
             self.assertEqual(historical["bytes"], source["bytes"])
             self.assertEqual(historical["sha256"], source["sha256"])
             self.assertEqual(record["public_file_name"], source["release_asset_name"])
-            self.assertIsNone(record["public_identity"])
+            public = record["public_identity"]
+            self.assertEqual(
+                set(public),
+                {
+                    "bytes",
+                    "sha256",
+                    "tensor_fingerprint",
+                    "path_replacements",
+                    "residual_absolute_path_count",
+                },
+            )
+            self.assertGreater(public["bytes"], 0)
+            self.assertEqual(len(public["sha256"]), 64)
+            self.assertEqual(public["residual_absolute_path_count"], 0)
+            self.assertEqual(
+                {row["json_pointer"] for row in public["path_replacements"]},
+                {
+                    "/architecture/model_weight_path",
+                    "/experiment/model_weights",
+                },
+            )
             total_bytes += historical["bytes"]
         self.assertEqual(total_bytes, 423_860_180)
         self.assertEqual(total_bytes, self.spec["historical_total_bytes"])
+        public_total = sum(
+            record["public_identity"]["bytes"] for record in self.spec["records"]
+        )
+        self.assertEqual(public_total, 423_859_412)
+        self.assertEqual(public_total, self.spec["public_total_bytes"])
+
+    def test_identity_audit_receipt_is_path_free_and_pinned(self):
+        receipt = self.spec["identity_audit"]
+        self.assertEqual(receipt["status"], "pass")
+        self.assertEqual(receipt["report_bytes"], 37_737)
+        self.assertEqual(
+            receipt["report_sha256"],
+            "c41bd0091da3ee727477df5c96377147f04316340794fef5d0c681cbccf80be5",
+        )
+        self.assertEqual(receipt["protected_file_count"], 14)
+        self.assertEqual(
+            self.spec["serialization_runtime"],
+            {"python": "3.9.18", "torch": "2.5.1+cu124"},
+        )
+        self.assertEqual(receipt["report_bytes"], AUDIT_PATH.stat().st_size)
+        self.assertEqual(
+            receipt["report_sha256"],
+            hashlib.sha256(AUDIT_PATH.read_bytes()).hexdigest(),
+        )
+        portable_sidecar = (
+            PROJECT_ROOT / "artifacts" / "paper_core_input_audit.json.sha256"
+        ).read_text(encoding="ascii")
+        self.assertEqual(
+            portable_sidecar,
+            f"{receipt['report_sha256']}  paper_core_input_audit.json\n",
+        )
+
+    def test_audit_candidates_match_pinned_spec_record_by_record(self):
+        audit_records = self.audit["records"]
+        spec_records = self.spec["records"]
+        self.assertEqual(
+            [row["experiment_id"] for row in audit_records],
+            [row["experiment_id"] for row in spec_records],
+        )
+        self.assertEqual(len(audit_records), 12)
+        for discovered, pinned in zip(audit_records, spec_records):
+            candidate = discovered["public_checkpoint_candidate"]
+            self.assertEqual(discovered["method"], pinned["internal_method"])
+            self.assertEqual(discovered["training_seed"], pinned["training_seed"])
+            self.assertEqual(discovered["partition_seed"], pinned["partition_seed"])
+            self.assertEqual(discovered["rank"], pinned["rank"])
+            self.assertEqual(candidate["file_name"], pinned["public_file_name"])
+            self.assertEqual(
+                candidate["release_asset_name"], pinned["public_file_name"]
+            )
+            self.assertEqual(
+                {
+                    key: value
+                    for key, value in candidate.items()
+                    if key not in {"file_name", "release_asset_name"}
+                },
+                pinned["public_identity"],
+            )
 
     def test_spec_contains_no_absolute_or_private_paths(self):
         raw = SPEC_PATH.read_text(encoding="utf-8")

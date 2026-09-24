@@ -203,8 +203,11 @@ def _load_release_spec(path: Path) -> dict:
         raise CoreAuditError(f"Cannot read paper-core release spec: {error}") from error
     if not isinstance(value, dict) or value.get("schema_version") != 1:
         raise CoreAuditError("Paper-core release spec must use schema_version=1")
-    if value.get("status") != "public_identity_discovery_required":
-        raise CoreAuditError("Paper-core release spec is not awaiting identity discovery")
+    if value.get("status") not in {
+        "public_identity_discovery_required",
+        "public_identities_pinned",
+    }:
+        raise CoreAuditError("Paper-core release spec has an unsupported status")
     if value.get("expected_record_count") != 12:
         raise CoreAuditError("Paper-core release spec must require 12 records")
     records = value.get("records")
@@ -272,7 +275,6 @@ def _validate_spec_against_index(
             "public_file_name": (
                 row.get("public_file_name"), indexed["release_asset_name"]
             ),
-            "public_identity": (row.get("public_identity"), None),
         }
         mismatches = {
             key: {"spec": left, "index": right}
@@ -284,6 +286,45 @@ def _validate_spec_against_index(
                 f"Release-spec/index mismatch for {experiment_id}: "
                 + json.dumps(mismatches, sort_keys=True)
             )
+        public_identity = row.get("public_identity")
+        if spec["status"] == "public_identity_discovery_required":
+            if public_identity is not None:
+                raise CoreAuditError(
+                    f"Discovery spec unexpectedly pins a public identity: {experiment_id}"
+                )
+        else:
+            if not isinstance(public_identity, dict):
+                raise CoreAuditError(
+                    f"Pinned spec has no public identity: {experiment_id}"
+                )
+            tensor = public_identity.get("tensor_fingerprint")
+            if (
+                set(public_identity) != {
+                    "bytes", "sha256", "tensor_fingerprint",
+                    "path_replacements", "residual_absolute_path_count",
+                }
+                or isinstance(public_identity.get("bytes"), bool)
+                or not isinstance(public_identity.get("bytes"), int)
+                or public_identity["bytes"] <= 0
+                or not SHA256_PATTERN.fullmatch(str(public_identity.get("sha256", "")))
+                or public_identity.get("residual_absolute_path_count") != 0
+                or not isinstance(tensor, dict)
+                or tensor.get("algorithm")
+                != "recursive_path_dtype_shape_raw_bytes_sha256_v1"
+                or isinstance(tensor.get("tensor_count"), bool)
+                or not isinstance(tensor.get("tensor_count"), int)
+                or tensor["tensor_count"] <= 0
+                or not SHA256_PATTERN.fullmatch(str(tensor.get("sha256", "")))
+            ):
+                raise CoreAuditError(
+                    f"Pinned public identity is malformed: {experiment_id}"
+                )
+    if spec["status"] == "public_identities_pinned":
+        expected_public_total = sum(
+            int(row["public_identity"]["bytes"]) for row in spec_records
+        )
+        if spec.get("public_total_bytes") != expected_public_total:
+            raise CoreAuditError("Pinned public byte total is inconsistent")
 
 
 def _resolve_protected_file(project_root: Path, relative: str) -> Path:
@@ -754,12 +795,32 @@ def run_audit(
         sources.append((path, record, _verify_historical_identity(path, record)))
 
     torch = _load_torch()
+    runtime = _serialization_runtime(torch)
+    if (
+        spec["status"] == "public_identities_pinned"
+        and spec.get("serialization_runtime") != runtime
+    ):
+        raise CoreAuditError(
+            "Pinned public identities require the audited serialization runtime"
+        )
+    spec_by_experiment = {
+        row["experiment_id"]: row for row in spec["records"]
+    }
     audited_records = []
     for path, record, before in sources:
         payload = _restricted_load(str(path), torch)
         contract = validate_checkpoint_contract(payload, record, torch)
         public_identity = _discover_public_identity(payload, torch)
         _assert_existing_representative_identity(record, public_identity)
+        if spec["status"] == "public_identities_pinned":
+            expected_public = spec_by_experiment[record["experiment_id"]][
+                "public_identity"
+            ]
+            if public_identity != expected_public:
+                raise CoreAuditError(
+                    "Discovered public identity differs from the pinned spec for "
+                    f"{record['experiment_id']}"
+                )
         audited_records.append({
             "experiment_id": record["experiment_id"],
             "method": record["method"],
@@ -838,7 +899,7 @@ def run_audit(
             "bytes": spec_before["bytes"],
             "sha256": spec_before["sha256"],
         },
-        "serialization_runtime": _serialization_runtime(torch),
+        "serialization_runtime": runtime,
         "records": audited_records,
         "protected_source_gate": {
             "status": "pass",

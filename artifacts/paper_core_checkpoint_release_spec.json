@@ -1,8 +1,11 @@
 {
   "schema_version": 1,
   "release_id": "paper-core-checkpoints-v1.0.0",
-  "status": "public_identity_discovery_required",
-  "description": "Exact historical allowlist for the 12-checkpoint paper-core release. Public file identities remain null until the read-only discovery report is reviewed and committed.",
+  "release_tag": "paper-core-checkpoints-v1.0.0",
+  "archive_name": "fedlora-paper-core-checkpoints-v1.0.0.tar.gz",
+  "archive_root": "paper-core-checkpoints",
+  "status": "public_identities_pinned",
+  "description": "Exact historical allowlist and audited path-sanitized public identities for the 12-checkpoint paper-core release.",
   "checkpoint_index": {
     "path": "artifacts/checkpoint_index.json",
     "sha256": "f2b630085df03dfcf04e4ebac2b973968d8b28b3674354f47e4ab4805556c068"
@@ -26,6 +29,21 @@
     "file_name": "rtdetr-l.pt",
     "sha256": "6de60b10d4bc566f00cda0f5b4d64afe4b66d48dc9695d2171effb7859d8e73f"
   },
+  "serialization_runtime": {
+    "python": "3.9.18",
+    "torch": "2.5.1+cu124"
+  },
+  "identity_audit": {
+    "status": "pass",
+    "policy": "paper_core_12_checkpoint_read_only_prepublication_audit",
+    "auditor_source_commit": "ac9d95ade327329a147c627cc417f865e7e7be83",
+    "report_bytes": 37737,
+    "report_sha256": "c41bd0091da3ee727477df5c96377147f04316340794fef5d0c681cbccf80be5",
+    "protected_file_count": 14,
+    "historical_checkpoint_bytes": 423860180,
+    "public_checkpoint_bytes": 423859412
+  },
+  "public_total_bytes": 423859412,
   "expected_record_count": 12,
   "historical_total_bytes": 423860180,
   "records": [
@@ -44,7 +62,28 @@
         "sha256": "79d937ea780e611ad3f93655d3fd7399293f0b3aaf3c4a1240b5a196236d426c"
       },
       "public_file_name": "seed_42__fl_full_ft_a0.4__best_federated.pt",
-      "public_identity": null
+      "public_identity": {
+        "bytes": 131947224,
+        "path_replacements": [
+          {
+            "historical_value_sha256": "98049dad690d26a51a7cb724d87276d0d30964ae66c04e4fe61efd8d8a56ed30",
+            "json_pointer": "/architecture/model_weight_path",
+            "public_value": "external/rtdetr-l.pt"
+          },
+          {
+            "historical_value_sha256": "98049dad690d26a51a7cb724d87276d0d30964ae66c04e4fe61efd8d8a56ed30",
+            "json_pointer": "/experiment/model_weights",
+            "public_value": "external/rtdetr-l.pt"
+          }
+        ],
+        "residual_absolute_path_count": 0,
+        "sha256": "50e3c33ed8cf821c109d0504c9f47f4b8bc0e3ac2d4ea7fbe1009fc11ef60279",
+        "tensor_fingerprint": {
+          "algorithm": "recursive_path_dtype_shape_raw_bytes_sha256_v1",
+          "sha256": "56c5abee3cc372562023fbbc0500ff6f3880455e136a447ae42d61ea9c8f4831",
+          "tensor_count": 941
+        }
+      }
     },
     {
       "experiment_id": "seed_42/fl_lora_r8_a0.4",
@@ -61,7 +100,28 @@
         "sha256": "05ca4d38d7a3632dec54c6592da8d58bd5951f6fb11744b4d212fee6f1c618b3"
       },
       "public_file_name": "seed_42__fl_lora_r8_a0.4__best_federated.pt",
-      "public_identity": null
+      "public_identity": {
+        "bytes": 1930492,
+        "path_replacements": [
+          {
+            "historical_value_sha256": "98049dad690d26a51a7cb724d87276d0d30964ae66c04e4fe61efd8d8a56ed30",
+            "json_pointer": "/architecture/model_weight_path",
+            "public_value": "external/rtdetr-l.pt"
+          },
+          {
+            "historical_value_sha256": "98049dad690d26a51a7cb724d87276d0d30964ae66c04e4fe61efd8d8a56ed30",
+            "json_pointer": "/experiment/model_weights",
+            "public_value": "external/rtdetr-l.pt"
+          }
+        ],
+        "residual_absolute_path_count": 0,
+        "sha256": "2bd1f48417b5fe5765dd501e02f9e299d6e1d736a4aade9ae0d59ab9cea21d16",
+        "tensor_fingerprint": {
+          "algorithm": "recursive_path_dtype_shape_raw_bytes_sha256_v1",
+          "sha256": "0f45f698a934ba13016659e1d264d615ba226fadceb4170b9891941ca05109c6",
+          "tensor_count": 123
+        }
+      }
     },
     {
       "experiment_id": "seed_42/fl_fedsa_lora_r8_a0.4",
@@ -78,7 +138,28 @@
         "sha256": "3ed025419506009465add698da75fef941c20c0b16eb347bb224820781b9cac4"
       },
       "public_file_name": "seed_42__fl_fedsa_lora_r8_a0.4__best_federated.pt",
-      "public_identity": null
+      "public_identity": {
+        "bytes": 3316452,
+        "path_replacements": [
+          {
+            "historical_value_sha256": "98049dad690d26a51a7cb724d87276d0d30964ae66c04e4fe61efd8d8a56ed30",
+            "json_pointer": "/architecture/model_weight_path",
+            "public_value": "external/rtdetr-l.pt"
+          },
+          {
+            "historical_value_sha256": "98049dad690d26a51a7cb724d87276d0d30964ae66c04e4fe61efd8d8a56ed30",
+            "json_pointer": "/experiment/model_weights",
+            "public_value": "external/rtdetr-l.pt"
+          }
+        ],
+        "residual_absolute_path_count": 0,
+        "sha256": "391205473ad8de24af56ba1b566e54a6f305dd0b79806cb468583e84e464fa14",
+        "tensor_fingerprint": {
+          "algorithm": "recursive_path_dtype_shape_raw_bytes_sha256_v1",
+          "sha256": "b42e1e811238caf1ec76e788547dbcf46d8f390b3b0e63864cf3d303e88c6d4f",
+          "tensor_count": 231
+        }
+      }
     },
     {
       "experiment_id": "seed_42/fl_fixed_share_b_lora_r8_a0.4",
@@ -95,7 +176,28 @@
         "sha256": "6092d9500de123a1ce7f16ff3c0290c2bff02911bf1ffb0efa78e096d00c6c7d"
       },
       "public_file_name": "seed_42__fl_fixed_share_b_lora_r8_a0.4__best_federated.pt",
-      "public_identity": null
+      "public_identity": {
+        "bytes": 4093796,
+        "path_replacements": [
+          {
+            "historical_value_sha256": "98049dad690d26a51a7cb724d87276d0d30964ae66c04e4fe61efd8d8a56ed30",
+            "json_pointer": "/architecture/model_weight_path",
+            "public_value": "external/rtdetr-l.pt"
+          },
+          {
+            "historical_value_sha256": "98049dad690d26a51a7cb724d87276d0d30964ae66c04e4fe61efd8d8a56ed30",
+            "json_pointer": "/experiment/model_weights",
+            "public_value": "external/rtdetr-l.pt"
+          }
+        ],
+        "residual_absolute_path_count": 0,
+        "sha256": "8be445020d179828fd337666a9b85648468d9f36268bd3cfadb6707475ccab9c",
+        "tensor_fingerprint": {
+          "algorithm": "recursive_path_dtype_shape_raw_bytes_sha256_v1",
+          "sha256": "8680f5e9c3fe69968966a07e89a1af677ee3ec2483d2ea43e36477c316e1ba9e",
+          "tensor_count": 231
+        }
+      }
     },
     {
       "experiment_id": "seed_43/fl_full_ft_a0.4",
@@ -112,7 +214,28 @@
         "sha256": "a9a417d0a416e970361df56dd95fca234958c5384ba637e0ad5a922e33be149a"
       },
       "public_file_name": "seed_43__fl_full_ft_a0.4__best_federated.pt",
-      "public_identity": null
+      "public_identity": {
+        "bytes": 131947224,
+        "path_replacements": [
+          {
+            "historical_value_sha256": "98049dad690d26a51a7cb724d87276d0d30964ae66c04e4fe61efd8d8a56ed30",
+            "json_pointer": "/architecture/model_weight_path",
+            "public_value": "external/rtdetr-l.pt"
+          },
+          {
+            "historical_value_sha256": "98049dad690d26a51a7cb724d87276d0d30964ae66c04e4fe61efd8d8a56ed30",
+            "json_pointer": "/experiment/model_weights",
+            "public_value": "external/rtdetr-l.pt"
+          }
+        ],
+        "residual_absolute_path_count": 0,
+        "sha256": "55985dc7a5dcc5909a7bcf72c04908f2b848b5f5ec9753f2250b6f4be6bab5ac",
+        "tensor_fingerprint": {
+          "algorithm": "recursive_path_dtype_shape_raw_bytes_sha256_v1",
+          "sha256": "6a441c3fb13b73114063d2d10200cc13cf7d652f73f1185192ed686cc697ec2d",
+          "tensor_count": 941
+        }
+      }
     },
     {
       "experiment_id": "seed_43/fl_lora_r8_a0.4",
@@ -129,7 +252,28 @@
         "sha256": "ad928c84c5f1a82f7f88334ce5825422d1249bd59cb934eaeb3ddac3a751ff02"
       },
       "public_file_name": "seed_43__fl_lora_r8_a0.4__best_federated.pt",
-      "public_identity": null
+      "public_identity": {
+        "bytes": 1930492,
+        "path_replacements": [
+          {
+            "historical_value_sha256": "98049dad690d26a51a7cb724d87276d0d30964ae66c04e4fe61efd8d8a56ed30",
+            "json_pointer": "/architecture/model_weight_path",
+            "public_value": "external/rtdetr-l.pt"
+          },
+          {
+            "historical_value_sha256": "98049dad690d26a51a7cb724d87276d0d30964ae66c04e4fe61efd8d8a56ed30",
+            "json_pointer": "/experiment/model_weights",
+            "public_value": "external/rtdetr-l.pt"
+          }
+        ],
+        "residual_absolute_path_count": 0,
+        "sha256": "66214a9a22ab8042b1a6abd1353d10ec56e06ca11c612c5580181ec0342e372b",
+        "tensor_fingerprint": {
+          "algorithm": "recursive_path_dtype_shape_raw_bytes_sha256_v1",
+          "sha256": "4679b3a05262b9c299036ad3d3707f0ff8e5c215684cccf585cab5a6dc501078",
+          "tensor_count": 123
+        }
+      }
     },
     {
       "experiment_id": "seed_43/fl_fedsa_lora_r8_a0.4",
@@ -146,7 +290,28 @@
         "sha256": "c0ebf42091e3381c933a824c0b53f993af72c016c2e5015105ef90889448c616"
       },
       "public_file_name": "seed_43__fl_fedsa_lora_r8_a0.4__best_federated.pt",
-      "public_identity": null
+      "public_identity": {
+        "bytes": 3316452,
+        "path_replacements": [
+          {
+            "historical_value_sha256": "98049dad690d26a51a7cb724d87276d0d30964ae66c04e4fe61efd8d8a56ed30",
+            "json_pointer": "/architecture/model_weight_path",
+            "public_value": "external/rtdetr-l.pt"
+          },
+          {
+            "historical_value_sha256": "98049dad690d26a51a7cb724d87276d0d30964ae66c04e4fe61efd8d8a56ed30",
+            "json_pointer": "/experiment/model_weights",
+            "public_value": "external/rtdetr-l.pt"
+          }
+        ],
+        "residual_absolute_path_count": 0,
+        "sha256": "bcd02b63edd5c19f1949fded5268c4e70215e4aea84e816be0c30fd252e10e49",
+        "tensor_fingerprint": {
+          "algorithm": "recursive_path_dtype_shape_raw_bytes_sha256_v1",
+          "sha256": "554c124dc25dc0c0fec04450a20f1564f08aef9c1138a6521ef8227d40603b6c",
+          "tensor_count": 231
+        }
+      }
     },
     {
       "experiment_id": "seed_43/fl_fixed_share_b_lora_r8_a0.4",
@@ -163,7 +328,28 @@
         "sha256": "f454435dc0a37530c919ccfff921ddfbe84fb18bc1919477cad186fdf513116d"
       },
       "public_file_name": "seed_43__fl_fixed_share_b_lora_r8_a0.4__best_federated.pt",
-      "public_identity": null
+      "public_identity": {
+        "bytes": 4093732,
+        "path_replacements": [
+          {
+            "historical_value_sha256": "98049dad690d26a51a7cb724d87276d0d30964ae66c04e4fe61efd8d8a56ed30",
+            "json_pointer": "/architecture/model_weight_path",
+            "public_value": "external/rtdetr-l.pt"
+          },
+          {
+            "historical_value_sha256": "98049dad690d26a51a7cb724d87276d0d30964ae66c04e4fe61efd8d8a56ed30",
+            "json_pointer": "/experiment/model_weights",
+            "public_value": "external/rtdetr-l.pt"
+          }
+        ],
+        "residual_absolute_path_count": 0,
+        "sha256": "0fd77167da7753e16d7a62a71816dcd07cb473078d9d09aba0f05059ae5aec3a",
+        "tensor_fingerprint": {
+          "algorithm": "recursive_path_dtype_shape_raw_bytes_sha256_v1",
+          "sha256": "f1d9dad03b02582ef33f764a76eaff3baeeeb68b80d9d01782f7c905c541d5e2",
+          "tensor_count": 231
+        }
+      }
     },
     {
       "experiment_id": "seed_44/fl_full_ft_a0.4",
@@ -180,7 +366,28 @@
         "sha256": "d1b668e1fe50b07fbd3eb079cefb5eeb087fc39dd81fa46bf6ece356572a2f21"
       },
       "public_file_name": "seed_44__fl_full_ft_a0.4__best_federated.pt",
-      "public_identity": null
+      "public_identity": {
+        "bytes": 131946136,
+        "path_replacements": [
+          {
+            "historical_value_sha256": "98049dad690d26a51a7cb724d87276d0d30964ae66c04e4fe61efd8d8a56ed30",
+            "json_pointer": "/architecture/model_weight_path",
+            "public_value": "external/rtdetr-l.pt"
+          },
+          {
+            "historical_value_sha256": "98049dad690d26a51a7cb724d87276d0d30964ae66c04e4fe61efd8d8a56ed30",
+            "json_pointer": "/experiment/model_weights",
+            "public_value": "external/rtdetr-l.pt"
+          }
+        ],
+        "residual_absolute_path_count": 0,
+        "sha256": "4e11b12b07c01a090eb7a4d3d24f728249e1821f4a22a4d0120054a95437626b",
+        "tensor_fingerprint": {
+          "algorithm": "recursive_path_dtype_shape_raw_bytes_sha256_v1",
+          "sha256": "5ab7039b92e1b7c338efb2b2e8b98a3fd978bd49626725947db9d7eff47062e7",
+          "tensor_count": 941
+        }
+      }
     },
     {
       "experiment_id": "seed_44/fl_lora_r8_a0.4",
@@ -197,7 +404,28 @@
         "sha256": "f08d4926f15b0b8569ed080d228bee4df61aa55c0aa690b3d28e3f0f337c65e6"
       },
       "public_file_name": "seed_44__fl_lora_r8_a0.4__best_federated.pt",
-      "public_identity": null
+      "public_identity": {
+        "bytes": 1929404,
+        "path_replacements": [
+          {
+            "historical_value_sha256": "98049dad690d26a51a7cb724d87276d0d30964ae66c04e4fe61efd8d8a56ed30",
+            "json_pointer": "/architecture/model_weight_path",
+            "public_value": "external/rtdetr-l.pt"
+          },
+          {
+            "historical_value_sha256": "98049dad690d26a51a7cb724d87276d0d30964ae66c04e4fe61efd8d8a56ed30",
+            "json_pointer": "/experiment/model_weights",
+            "public_value": "external/rtdetr-l.pt"
+          }
+        ],
+        "residual_absolute_path_count": 0,
+        "sha256": "a5531a4954f66512dc739a412dacbd7edf7876b1606ff9791ab3263aae88434b",
+        "tensor_fingerprint": {
+          "algorithm": "recursive_path_dtype_shape_raw_bytes_sha256_v1",
+          "sha256": "cf0303aedb752cb1b0849129d69730514b58af4ff431aa9ac1685205ecfb9485",
+          "tensor_count": 123
+        }
+      }
     },
     {
       "experiment_id": "seed_44/fl_fedsa_lora_r8_a0.4",
@@ -214,7 +442,28 @@
         "sha256": "9a794154670112920c77b893693c16c2969a002f036d19158604acd61ca62e97"
       },
       "public_file_name": "seed_44__fl_fedsa_lora_r8_a0.4__best_federated.pt",
-      "public_identity": null
+      "public_identity": {
+        "bytes": 3315364,
+        "path_replacements": [
+          {
+            "historical_value_sha256": "98049dad690d26a51a7cb724d87276d0d30964ae66c04e4fe61efd8d8a56ed30",
+            "json_pointer": "/architecture/model_weight_path",
+            "public_value": "external/rtdetr-l.pt"
+          },
+          {
+            "historical_value_sha256": "98049dad690d26a51a7cb724d87276d0d30964ae66c04e4fe61efd8d8a56ed30",
+            "json_pointer": "/experiment/model_weights",
+            "public_value": "external/rtdetr-l.pt"
+          }
+        ],
+        "residual_absolute_path_count": 0,
+        "sha256": "282ba2cf4f14f4320e1ac601e76a1791c6a72c49d7c2b13c222242fd6a3976bb",
+        "tensor_fingerprint": {
+          "algorithm": "recursive_path_dtype_shape_raw_bytes_sha256_v1",
+          "sha256": "0a5a66d7289a5cfc405124bf4d1f65b4466a5dd1ceee330ce13affd1eec76a3f",
+          "tensor_count": 231
+        }
+      }
     },
     {
       "experiment_id": "seed_44/fl_fixed_share_b_lora_r8_a0.4",
@@ -231,7 +480,28 @@
         "sha256": "6bf78aaa35fd214f95d9fb4462fb54ae37171bc08c9e2a7f1085d96e9708562c"
       },
       "public_file_name": "seed_44__fl_fixed_share_b_lora_r8_a0.4__best_federated.pt",
-      "public_identity": null
+      "public_identity": {
+        "bytes": 4092644,
+        "path_replacements": [
+          {
+            "historical_value_sha256": "98049dad690d26a51a7cb724d87276d0d30964ae66c04e4fe61efd8d8a56ed30",
+            "json_pointer": "/architecture/model_weight_path",
+            "public_value": "external/rtdetr-l.pt"
+          },
+          {
+            "historical_value_sha256": "98049dad690d26a51a7cb724d87276d0d30964ae66c04e4fe61efd8d8a56ed30",
+            "json_pointer": "/experiment/model_weights",
+            "public_value": "external/rtdetr-l.pt"
+          }
+        ],
+        "residual_absolute_path_count": 0,
+        "sha256": "30359c79c8638da8f06c045fa87ce36dfcc0114a586bb5475c491d165f92917e",
+        "tensor_fingerprint": {
+          "algorithm": "recursive_path_dtype_shape_raw_bytes_sha256_v1",
+          "sha256": "ab1821bf945ddced2b136ac69d02ee74a2e12bf7c6e8dc2fd1789a70d1e806f2",
+          "tensor_count": 231
+        }
+      }
     }
   ]
 }

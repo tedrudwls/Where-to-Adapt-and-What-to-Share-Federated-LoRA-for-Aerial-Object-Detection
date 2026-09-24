@@ -54,6 +54,50 @@ This separation prevents a self-consistent but unintended checkpoint rewrite
 from being accepted merely because the archive manifest and checksums were
 rewritten at the same time.
 
+Phase 1 is complete. The committed
+[path-free audit report](../artifacts/paper_core_input_audit.json) covered all 12 checkpoints,
+kept all 14 protected inputs byte-identical, and recorded the following
+portable identity:
+
+```text
+report bytes:   37,737
+report SHA-256: c41bd0091da3ee727477df5c96377147f04316340794fef5d0c681cbccf80be5
+runtime:        Python 3.9.18 / PyTorch 2.5.1+cu124
+historical:     423,860,180 bytes
+public files:   423,859,412 bytes
+```
+
+The 12 resulting public sizes, SHA-256 values, tensor counts and tensor
+fingerprints are now pinned in
+[`artifacts/paper_core_checkpoint_release_spec.json`](../artifacts/paper_core_checkpoint_release_spec.json).
+The original host-generated checksum sidecar contained a server absolute path,
+so that file was not retained. A canonical basename-only
+[`paper_core_input_audit.json.sha256`](../artifacts/paper_core_input_audit.json.sha256)
+sidecar was generated from the independently verified digest and committed.
+
+## Clean bundle build
+
+Run the builder from a clean checkout at an immutable commit while pointing
+`--source-project` to the historical artifact tree. It restricted-loads and
+processes one checkpoint set at a time, reproduces every pinned public identity,
+streams the deterministic tar.gz, re-hashes all protected inputs, and performs
+the structural verifier before an atomic output-directory rename.
+
+```bash
+python3 scripts/build_paper_core_release_bundle.py \
+  --source-project /path/to/historical/fedsalora \
+  --output-dir /path/to/new/paper-core-release-output
+
+python3 scripts/verify_paper_core_release_bundle.py \
+  --archive /path/to/new/paper-core-release-output/fedlora-paper-core-checkpoints-v1.0.0.tar.gz \
+  --checksum /path/to/new/paper-core-release-output/fedlora-paper-core-checkpoints-v1.0.0.tar.gz.sha256
+```
+
+The verifier checks the outer digest on the same open file descriptor before
+opening its gzip/tar stream and hashes tar members incrementally. It never
+deserializes checkpoint data. The separate GPU replay gate remains required
+before publication.
+
 ## Intended archive boundary
 
 ```text
@@ -66,7 +110,8 @@ paper-core-checkpoints/
 ├── checkpoints/
 │   └── <12 path-sanitized checkpoint files>
 └── metadata/
-    └── paper_core_checkpoint_release_spec.json
+    ├── paper_core_checkpoint_release_spec.json
+    └── paper_core_input_audit.json
 ```
 
 The archive does **not** include AOD-4 images or annotations, the upstream
@@ -93,8 +138,8 @@ ablation checkpoints.
 
 Before publication, the maintainers must complete all of the following:
 
-1. obtain a 12/12 passing read-only discovery report;
-2. commit the reviewed, path-free public identity specification;
+1. **Completed:** obtain a 12/12 passing read-only discovery report;
+2. **Completed:** commit the reviewed, path-free public identity specification;
 3. build from a clean immutable source commit using streaming archive I/O;
 4. verify the outer checksum and every exact archive member identity;
 5. extract into a fresh directory and run at least the already documented
