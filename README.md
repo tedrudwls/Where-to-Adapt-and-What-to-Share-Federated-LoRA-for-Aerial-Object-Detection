@@ -117,9 +117,9 @@ The official export has 281 key/hash-connected source components spanning at lea
 
 ## Citation and license
 
-**Authors:** Gyeongjin Kim<sup>†</sup>, Yeongjin Jeon<sup>†</sup>, Jae Kwan Park, Yuhyun Chae, and Hyukjin Kwon<sup>*</sup>
+**Authors:** Gyeongjin Kim<sup>, Yeongjin Jeon, Jaekwan Park, Gyuhyun Chae, and Hyukjin Kwon<sup>*</sup>
 
-<sup>†</sup>Equal contribution. <sup>*</sup>Corresponding author.
+<sup>*</sup>Corresponding author.
 
 The manuscript is under preparation for submission. Use [`CITATION.cff`](CITATION.cff) to cite the software and include the exact commit; a preferred paper citation and persistent identifier will be added when available.
 
