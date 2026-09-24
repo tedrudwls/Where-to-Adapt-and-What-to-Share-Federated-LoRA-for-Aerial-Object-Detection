@@ -117,7 +117,7 @@ The official export has 281 key/hash-connected source components spanning at lea
 
 ## Citation and license
 
-**Authors:** Gyeongjin Kim<sup>, Yeongjin Jeon, Jaekwan Park, Gyuhyun Chae, and Hyukjin Kwon<sup>*</sup>
+**Authors:** Gyeongjin Kim, Yeongjin Jeon, Jaekwan Park, Gyuhyun Chae, and Hyukjin Kwon<sup>*</sup>
 
 <sup>*</sup>Corresponding author.
 
