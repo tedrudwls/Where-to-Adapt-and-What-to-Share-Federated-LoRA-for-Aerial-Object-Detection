@@ -132,9 +132,12 @@ The official export has 281 key/hash-connected source components spanning at lea
 
 ## Citation and license
 
-**Authors:** Gyeongjin Kim, Yeongjin Jeon, Kyuhyun Chae, Jae Kwan Park, and Hyukjin Kwon<sup>*</sup>
+**Authors:** Gyeongjin Kim<sup>†</sup>, Yeongjin Jeon<sup>†</sup>, Kyuhyun Chae, Jae Kwan Park, and Hyukjin Kwon<sup>*</sup>
 
-<sup>*</sup>Corresponding author.
+<sup>†</sup> These authors contributed equally to this work.<br>
+<sup>*</sup> Corresponding author.
+
+**Repository contributors:** [Yeongjin Jeon (@ipinid613)](https://github.com/ipinid613) and [Jae Kwan Park (@JAEKWANBLNR)](https://github.com/JAEKWANBLNR).
 
 Use [`CITATION.cff`](CITATION.cff) to cite the software and include the exact commit; a preferred paper citation and persistent identifier will be added when available.
 
