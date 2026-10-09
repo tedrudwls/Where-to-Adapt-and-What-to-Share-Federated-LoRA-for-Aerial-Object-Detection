@@ -11,10 +11,10 @@ authors:
     given-names: Gyeongjin
   - family-names: Jeon
     given-names: Yeongjin
+  - family-names: Chae
+    given-names: Kyuhyun
   - family-names: Park
     given-names: Jae Kwan
-  - family-names: Chae
-    given-names: Yuhyun
   - family-names: Kwon
     given-names: Hyukjin
 repository-code: "https://github.com/tedrudwls/Where-to-Adapt-and-What-to-Share-Federated-LoRA-for-Aerial-Object-Detection"
